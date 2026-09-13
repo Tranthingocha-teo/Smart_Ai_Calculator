@@ -16,6 +16,8 @@
     <string name="menu_loan_calculator">Loan Calculator</string>
     <string name="menu_gpa_calculator">GPA Calculator</string>
     <string name="menu_bmi_calculator">BMI Calculator</string>
+    <string name="menu_graphing_calculator">Graphing Calculator</string>
+    <string name="graphing_title">Graphing Calculator</string>
 
     <!-- Select Language -->
     <string name="select_language">Select Language</string>

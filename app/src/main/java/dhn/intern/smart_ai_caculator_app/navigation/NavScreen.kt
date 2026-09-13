@@ -59,6 +59,10 @@ sealed class NavScreen {
         const val route = "gpa_caculator"
     }
 
+    object GraphingCalculatorScreen : NavScreen() {
+        const val route = "graphing_calculator"
+    }
+
     object ResultBMIScreen {
         const val route = "result_bmi_screen/{weight}/{heightFt}/{heightIn}/{age}/{gender}/{bmi}"
 
