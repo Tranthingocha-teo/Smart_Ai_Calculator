@@ -67,6 +67,7 @@ import dhn.intern.smart_ai_caculator_app.ui.components.graphing.GraphCanvas
 import dhn.intern.smart_ai_caculator_app.ui.components.graphing.PresetBottomSheet
 import dhn.intern.smart_ai_caculator_app.ui.viewmodel.FunctionItem
 import dhn.intern.smart_ai_caculator_app.ui.viewmodel.GraphingCalculatorViewModel
+import dhn.intern.smart_ai_caculator_app.util.graphing.GraphImageExporter
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -113,7 +114,7 @@ fun GraphingCalculatorScreen(
                         coroutineScope.launch {
                             try {
                                 val bitmap = graphicsLayer.toImageBitmap().asAndroidBitmap()
-                                viewModel.exportGraphImage(context, bitmap)
+                                GraphImageExporter.shareGraphImage(context, bitmap)
                             } catch (_: Exception) {}
                         }
                     }) {

@@ -11,6 +11,19 @@ import java.io.FileOutputStream
 
 object GraphImageExporter {
 
+    fun exportCanvasToPng(context: Context, bitmap: Bitmap): android.net.Uri {
+        val cacheDir = File(context.cacheDir, "graph_images").apply { mkdirs() }
+        val file = File(cacheDir, "graph_${System.currentTimeMillis()}.png")
+        FileOutputStream(file).use { out ->
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+        }
+        return FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.provider",
+            file
+        )
+    }
+
     suspend fun saveBitmapToCache(context: Context, bitmap: Bitmap): Result<File> = withContext(Dispatchers.IO) {
         runCatching {
             val cacheDir = File(context.cacheDir, "graph_images").apply { mkdirs() }

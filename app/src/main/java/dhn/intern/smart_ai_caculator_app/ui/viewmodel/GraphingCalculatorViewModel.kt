@@ -1,7 +1,5 @@
 package dhn.intern.smart_ai_caculator_app.ui.viewmodel
 
-import android.content.Context
-import android.graphics.Bitmap
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -18,7 +16,6 @@ import dhn.intern.smart_ai_caculator_app.domain.graphing.SampledCurve
 import dhn.intern.smart_ai_caculator_app.domain.graphing.SpecialPoint
 import dhn.intern.smart_ai_caculator_app.domain.graphing.ViewportBounds
 import dhn.intern.smart_ai_caculator_app.enum.HistorySource
-import dhn.intern.smart_ai_caculator_app.util.graphing.GraphImageExporter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -90,9 +87,10 @@ class GraphingCalculatorViewModel(
     )
     val uiState: StateFlow<GraphingUiState> = _uiState.asStateFlow()
 
+    private var isRestoringFromHistory = true
+
     init {
         restoreFromHistoryIfAvailable()
-        recomputeCurves()
     }
 
     fun onKeyPress(key: String) {
@@ -134,6 +132,7 @@ class GraphingCalculatorViewModel(
             state.copy(functions = updated)
         }
         recomputeCurves()
+        persistActiveFunctions()
     }
 
     fun clearActiveFunction() {
@@ -158,6 +157,7 @@ class GraphingCalculatorViewModel(
             )
         }
         recomputeCurves()
+        persistActiveFunctions()
     }
 
     fun removeFunction(index: Int) {
@@ -174,6 +174,7 @@ class GraphingCalculatorViewModel(
             state.copy(functions = updated, activeFunctionIndex = newActive)
         }
         recomputeCurves()
+        persistActiveFunctions()
     }
 
     fun toggleFunctionVisibility(index: Int) {
@@ -184,6 +185,7 @@ class GraphingCalculatorViewModel(
             state.copy(functions = updated)
         }
         recomputeCurves()
+        persistActiveFunctions()
     }
 
     fun selectFunction(index: Int) {
@@ -346,7 +348,6 @@ class GraphingCalculatorViewModel(
                 intersections = intersections
             )
         }
-        persistActiveFunctions()
     }
 
     fun applyPreset(preset: GraphPreset) {
@@ -360,20 +361,18 @@ class GraphingCalculatorViewModel(
 
     fun getPresets(): List<GraphPreset> = presetRepository.getPresets()
 
-    fun exportGraphImage(context: Context, bitmap: Bitmap, onResult: (Boolean) -> Unit = {}) {
-        viewModelScope.launch {
-            val result = GraphImageExporter.shareGraphImage(context, bitmap)
-            onResult(result.isSuccess)
-        }
-    }
-
     private fun restoreFromHistoryIfAvailable() {
-        if (historyRepository == null) return
+        if (historyRepository == null) {
+            isRestoringFromHistory = false
+            recomputeCurves()
+            return
+        }
         viewModelScope.launch {
             try {
                 val savedHistories = historyRepository.getLatestBySource(HistorySource.GRAPHING_CALCULATOR, limit = 5)
                 if (savedHistories.isNotEmpty()) {
-                    val restored = savedHistories.mapIndexed { index, entity ->
+                    val chronological = savedHistories.reversed()
+                    val restored = chronological.mapIndexed { index, entity ->
                         val color = entity.colorHex?.let { parseHexColor(it) }
                             ?: colorPalette[index % colorPalette.size]
                         FunctionItem(
@@ -390,16 +389,18 @@ class GraphingCalculatorViewModel(
                             viewport = restoredViewport ?: state.viewport
                         )
                     }
-                    recomputeCurves()
                 }
             } catch (_: Exception) {
                 // Keep defaults if failed
+            } finally {
+                isRestoringFromHistory = false
+                recomputeCurves()
             }
         }
     }
 
     fun persistActiveFunctions() {
-        if (historyRepository == null) return
+        if (historyRepository == null || isRestoringFromHistory) return
         val currentFunctions = _uiState.value.functions
         val viewport = _uiState.value.viewport
         val viewportStr = "${viewport.minX},${viewport.maxX},${viewport.minY},${viewport.maxY}"
