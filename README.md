@@ -1,12 +1,19 @@
 # 🧮 Smart AI Calculator App
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Platform-Android-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Android" />
-  <img src="https://img.shields.io/badge/Language-Kotlin-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white" alt="Kotlin" />
-  <img src="https://img.shields.io/badge/UI-Jetpack%20Compose-4285F4?style=for-the-badge&logo=jetpackcompose&logoColor=white" alt="Jetpack Compose" />
-  <img src="https://img.shields.io/badge/Design-Material%203-795548?style=for-the-badge&logo=materialdesign&logoColor=white" alt="Material 3" />
-  <img src="https://img.shields.io/badge/DI-Koin-orange?style=for-the-badge" alt="Koin" />
-  <img src="https://img.shields.io/badge/Database-Room-1572B6?style=for-the-badge&logo=sqlite&logoColor=white" alt="Room" />
+  <a href="https://github.com/Tranthingocha-teo/Smart_Ai_Calculator/actions/workflows/android-ci.yml">
+    <img src="https://github.com/Tranthingocha-teo/Smart_Ai_Calculator/actions/workflows/android-ci.yml/badge.svg" alt="Android CI" />
+  </a>
+  <a href="https://github.com/Tranthingocha-teo/Smart_Ai_Calculator/releases">
+    <img src="https://img.shields.io/github/v/release/Tranthingocha-teo/Smart_Ai_Calculator?style=flat&color=32CD32&label=Release" alt="Release" />
+  </a>
+  <img src="https://img.shields.io/badge/Platform-Android-3DDC84?style=flat&logo=android&logoColor=white" alt="Android" />
+  <img src="https://img.shields.io/badge/Language-Kotlin-7F52FF?style=flat&logo=kotlin&logoColor=white" alt="Kotlin" />
+  <img src="https://img.shields.io/badge/UI-Jetpack%20Compose-4285F4?style=flat&logo=jetpackcompose&logoColor=white" alt="Jetpack Compose" />
+  <img src="https://img.shields.io/badge/Design-Material%203-795548?style=flat&logo=materialdesign&logoColor=white" alt="Material 3" />
+  <img src="https://img.shields.io/badge/DI-Koin-orange?style=flat" alt="Koin" />
+  <img src="https://img.shields.io/badge/Database-Room-1572B6?style=flat&logo=sqlite&logoColor=white" alt="Room" />
+  <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=flat" alt="License: MIT" /></a>
 </p>
 
 An all-in-one, modern, and intelligent calculator suite designed for Android. Built with **100% Jetpack Compose**, **Material 3**, and Clean Architecture principles, **Smart AI Calculator** delivers a seamless, pixel-perfect user experience across standard mathematics, smart AI problem solving, finance, lifestyle, and education.
@@ -140,6 +147,21 @@ app/src/main/java/dhn/intern/smart_ai_caculator_app/
    ./gradlew assembleDebug
    adb install -r app/build/outputs/apk/debug/app-debug.apk
    ```
+
+---
+
+## 🏛️ Project Management & Engineering Governance
+
+This project adheres to professional Software Engineering principles and utilizes GitHub's project management ecosystem:
+
+- 📋 **[GitHub Milestones](https://github.com/Tranthingocha-teo/Smart_Ai_Calculator/milestones)**: Track development phases from MVP to final release.
+- 🎯 **[GitHub Issues](https://github.com/Tranthingocha-teo/Smart_Ai_Calculator/issues)**: Work Breakdown Structure (WBS) with canonical labels (`type:`, `priority:`, `module:`, `triage`).
+- 🤖 **[AGENTS.md](AGENTS.md)**: Agent skills & operating specifications (Matt Pocock standard).
+- 🌿 **[CONTRIBUTING.md](CONTRIBUTING.md)**: Git branching strategy (GitHub Flow) and Conventional Commits.
+- 📚 **[Architecture Decision Records (docs/adr/)](docs/adr/)**: Documented technical decisions (Jetpack Compose, Koin, Room DB, Gemini SDK, Math engines).
+- 🔄 **[CHANGELOG.md](CHANGELOG.md)**: Semantic versioning release log following Keep a Changelog.
+- 🔒 **[SECURITY.md](SECURITY.md)** & **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)**: Vulnerability disclosure policy and community standards.
+- ⚡ **[GitHub Actions CI/CD](.github/workflows/android-ci.yml)**: Continuous integration pipeline running unit tests and APK compilation.
 
 ---
 

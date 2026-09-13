@@ -1,0 +1,46 @@
+name: "✨ Feature Request / Yêu cầu Tính năng"
+description: "Đề xuất tính năng hoặc cải tiến mới cho Smart AI Calculator"
+title: "[Feat]: "
+labels: ["type: feature", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Cảm ơn bạn đã đóng góp ý tưởng phát triển **Smart AI Calculator**!
+  - type: textarea
+    id: problem
+    attributes:
+      label: "Bối cảnh & Vấn đề cần giải quyết"
+      description: "Mô tả ngắn gọn vấn đề người dùng gặp phải hoặc nhu cầu cần tính năng này."
+      placeholder: "Ví dụ: Người dùng cần tính toán phân số phức tạp khi quét qua camera..."
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: "Giải pháp Đề xuất"
+      description: "Mô tả chi tiết giải pháp bạn mong muốn ứng dụng thực hiện."
+      placeholder: "Ví dụ: Tích hợp Gemini 1.5 Flash để đọc công thức LaTeX..."
+    validations:
+      required: true
+  - type: dropdown
+    id: module
+    attributes:
+      label: "Module liên quan"
+      options:
+        - "module: ai (Camera Scan, Vision, Chat)"
+        - "module: calculator (Tip, Loan, Date, GPA, Basic)"
+        - "module: database (Room DB, History)"
+        - "module: ui (Giao diện, Theme, Localization)"
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: "Mức độ ưu tiên"
+      options:
+        - "priority: high"
+        - "priority: medium"
+        - "priority: low"
+    validations:
+      required: true

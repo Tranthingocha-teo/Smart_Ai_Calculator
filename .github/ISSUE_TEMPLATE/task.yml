@@ -1,0 +1,24 @@
+name: "📋 Task / Công việc Kỹ thuật"
+description: "Tạo đầu việc phát triển, kiểm thử hoặc tối ưu kiến trúc (WBS Task)"
+title: "[Task]: "
+labels: ["ready-for-agent"]
+body:
+  - type: textarea
+    id: task_description
+    attributes:
+      label: "Mục tiêu công việc"
+      description: "Mô tả cụ thể mục tiêu kỹ thuật cần đạt được."
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: "Tiêu chí nghiệm thu (Acceptance Criteria)"
+      description: "Điều kiện để task này được coi là hoàn thành (Done):"
+      value: |
+        - [ ] Viết code đáp ứng đặc tả
+        - [ ] Viết Unit Test kiểm thử logic liên quan
+        - [ ] Chạy `./gradlew testDebugUnitTest` pass 100%
+        - [ ] Kiểm tra thực tế trên Emulator
+    validations:
+      required: true
