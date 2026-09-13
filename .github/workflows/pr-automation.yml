@@ -1,0 +1,67 @@
+name: PR Automation & Team Assistant
+
+on:
+  pull_request:
+    types: [opened, ready_for_review]
+
+permissions:
+  pull-requests: write
+  issues: write
+  contents: read
+
+jobs:
+  pr_assistant:
+    name: Setup Reviewers & Verify Linked Issue
+    runs-on: ubuntu-latest
+    steps:
+      - name: Auto-assign Team Reviewers & Validate PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const author = pr.user.login;
+            const teamMembers = ['Tranthingocha-teo', 'dinhthianhsang', 'thuyydung'];
+            
+            // 1. Assign other team members as reviewers
+            const reviewersToAssign = teamMembers.filter(member => member !== author);
+            if (reviewersToAssign.length > 0) {
+              try {
+                await github.rest.pulls.requestReviewers({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: pr.number,
+                  reviewers: reviewersToAssign
+                });
+                console.log(`Successfully assigned reviewers: ${reviewersToAssign.join(', ')}`);
+              } catch (error) {
+                console.log(`Could not assign reviewers (might lack permissions or pending invite): ${error.message}`);
+              }
+            }
+
+            // 2. Add 'needs-review' label
+            try {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                labels: ['needs-review']
+              });
+            } catch (error) {
+              console.log(`Could not add label: ${error.message}`);
+            }
+
+            // 3. Check for linked Issue in PR body
+            const body = pr.body || '';
+            const hasIssueLink = /closes\s+#\d+|fixes\s+#\d+|resolves\s+#\d+/i.test(body);
+            if (!hasIssueLink) {
+              const friendlyComment = `👋 Chào @${author}!\n\n` +
+                `Nhắc nhở nhẹ từ bot: Pull Request này dường như chưa có từ khóa liên kết Issue (ví dụ: \`Closes #29\`, \`Closes #30\`, v.v.).\n\n` +
+                `💡 Bạn hãy chỉnh sửa mô tả PR và thêm dòng \`Closes #<mã_issue>\` để GitHub tự động đóng thẻ công việc trên [Roadmap Board](https://github.com/users/Tranthingocha-teo/projects/1) khi PR được merge nhé! Cảm ơn bạn! 🎉`;
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body: friendlyComment
+              });
+            }
