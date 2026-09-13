@@ -154,6 +154,7 @@ app/src/main/java/dhn/intern/smart_ai_caculator_app/
 
 This project adheres to professional Software Engineering principles and utilizes GitHub's project management ecosystem:
 
+- 📊 **[GitHub Projects Board (Kanban & Roadmap)](https://github.com/users/Tranthingocha-teo/projects/1)**: Real-time visual Kanban board tracking all Epics, Features, and Tasks across sprints.
 - 📋 **[GitHub Milestones](https://github.com/Tranthingocha-teo/Smart_Ai_Calculator/milestones)**: Track development phases from MVP to final release.
 - 🎯 **[GitHub Issues](https://github.com/Tranthingocha-teo/Smart_Ai_Calculator/issues)**: Work Breakdown Structure (WBS) with canonical labels (`type:`, `priority:`, `module:`, `triage`).
 - 🤖 **[AGENTS.md](AGENTS.md)**: Agent skills & operating specifications (Matt Pocock standard).
