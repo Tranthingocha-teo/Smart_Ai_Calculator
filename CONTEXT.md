@@ -15,3 +15,5 @@ This document defines the ubiquitous domain vocabulary and system context for th
 | **AI Chatbot** | Conversational tutor providing step-by-step math explanations and Q&A. | `ui/components/aiCalculator/AiChatScreen.kt` |
 | **Calculation History** | Local persistent storage using Room Database for past calculations across all calculator engines. | `data/local/` |
 | **Unit Keypad** | Custom on-screen keypad designed for rapid numeric entry without triggering soft keyboard overlays. | `ui/components/UnitKeypad.kt` |
+| **Crop Box Overlay** | Interactive viewport allowing users to isolate single math problems from photos before Gemini analysis. | `ui/components/aiCalculator/` |
+| **Pedagogical Math Response** | 3-tier structured solution format: (1) Final Answer, (2) Step-by-step reasoning, (3) Key formulas. | `domain/ai/` |
