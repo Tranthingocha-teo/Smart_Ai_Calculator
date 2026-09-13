@@ -34,11 +34,18 @@ fun unitsByCategory(category: UnitCategory): List<UnitItemUI> =
         )
         UnitCategory.VOLUME -> listOf(
             UnitItemUI("L", "Liter"),
-            UnitItemUI("mL", "SMilliliter"),
+            UnitItemUI("mL", "Milliliter"),
             UnitItemUI("cL", "Centiliter"),
             UnitItemUI("dL", "Deciliter"),
             UnitItemUI("hL", "Hectoliter"),
             UnitItemUI("kL", "Kiloliter"),
+            UnitItemUI("m³", "Cubic meter"),
+            UnitItemUI("cm³", "Cubic centimeter"),
+            UnitItemUI("gal", "Gallon (US)"),
+            UnitItemUI("qt", "Quart (US)"),
+            UnitItemUI("pt", "Pint (US)"),
+            UnitItemUI("cup", "Cup (US)"),
+            UnitItemUI("fl oz", "Fluid ounce (US)")
         )
         UnitCategory.TIME -> listOf(
             UnitItemUI("H", "Hour"),

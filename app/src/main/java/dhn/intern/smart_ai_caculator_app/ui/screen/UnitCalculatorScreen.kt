@@ -196,12 +196,6 @@ fun UnitCalculatorScreen(
                                 val tmpUnit = fromUnit
                                 fromUnit = toUnit
                                 toUnit = tmpUnit
-
-                                activeField = when (activeField) {
-                                    ActiveField.FROM -> ActiveField.TO
-                                    ActiveField.TO -> ActiveField.FROM
-                                    else -> ActiveField.FROM
-                                }
                             }
 
                             else -> {
