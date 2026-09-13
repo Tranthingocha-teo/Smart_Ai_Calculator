@@ -6,5 +6,12 @@ enum class UnitCategory {
     AREA,
     VOLUME,
     TIME,
-    DATA
+    DATA,
+    SPEED,
+    PRESSURE,
+    POWER,
+    ENERGY,
+    ANGLE,
+    FUEL,
+    TEMPERATURE
 }

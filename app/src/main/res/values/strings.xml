@@ -85,6 +85,15 @@
     <string name="unit_calculator_volume">Volume</string>
     <string name="unit_calculator_time">Time</string>
     <string name="unit_calculator_data">Data</string>
+    <string name="unit_calculator_speed">Speed</string>
+    <string name="unit_calculator_pressure">Pressure</string>
+    <string name="unit_calculator_power">Power</string>
+    <string name="unit_calculator_energy">Energy</string>
+    <string name="unit_calculator_angle">Angle</string>
+    <string name="unit_calculator_fuel">Fuel</string>
+    <string name="unit_calculator_temperature">Temperature</string>
+    <string name="unit_calculator_copied">Copied to clipboard</string>
+    <string name="unit_calculator_search">Search unit</string>
     <string name="unit_calculator_choose">Choose Unit</string>
     <string name="unit_calculator_please_choose">Choose Unit Please</string>
 

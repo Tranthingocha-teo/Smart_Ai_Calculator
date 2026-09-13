@@ -1,7 +1,11 @@
 package dhn.intern.smart_ai_caculator_app.ui.components.unitCalculator
 
+import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,21 +22,19 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import dhn.intern.smart_ai_caculator_app.R
-import dhn.intern.smart_ai_caculator_app.enum.ActiveField
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun UnitInputField(
     label: String,
@@ -44,6 +46,10 @@ fun UnitInputField(
     modifier: Modifier = Modifier
 ) {
     val shape = RoundedCornerShape(12.dp)
+    val context = LocalContext.current
+    val clipboardManager = LocalClipboardManager.current
+    val copiedMessage = stringResource(R.string.unit_calculator_copied)
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -51,7 +57,7 @@ fun UnitInputField(
     ) {
         Row(
             modifier = Modifier
-                .clickable{
+                .clickable {
                     onClick()
                 },
             verticalAlignment = Alignment.CenterVertically
@@ -72,14 +78,8 @@ fun UnitInputField(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        TextField(
-            value = value,
-            onValueChange = {},
-            readOnly = true,
+        Box(
             modifier = Modifier
-                .onFocusChanged {
-                    if (it.isFocused) onFocus()
-                }
                 .clip(shape = shape)
                 .fillMaxWidth()
                 .height(60.dp)
@@ -90,14 +90,32 @@ fun UnitInputField(
                     else
                         MaterialTheme.colorScheme.outline.copy(0.2f),
                     shape = RoundedCornerShape(10.dp)
-                ),
-            singleLine = true,
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer.copy(0.2f),
-                unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer.copy(0.2f),
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
+                )
+                .combinedClickable(
+                    onClick = onFocus,
+                    onLongClick = {
+                        if (value.isNotEmpty() && value != "0") {
+                            clipboardManager.setText(AnnotatedString(value))
+                            Toast.makeText(context, copiedMessage, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                )
+        ) {
+            TextField(
+                value = value,
+                onValueChange = {},
+                readOnly = true,
+                enabled = false,
+                modifier = Modifier.fillMaxSize(),
+                singleLine = true,
+                colors = TextFieldDefaults.colors(
+                    disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer.copy(0.2f),
+                    disabledTextColor = MaterialTheme.colorScheme.onBackground,
+                    disabledIndicatorColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                )
             )
-        )
+        }
     }
 }
