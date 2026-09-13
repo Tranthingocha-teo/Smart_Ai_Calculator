@@ -26,6 +26,10 @@ class SmartFormatterTest {
         val tiny = SmartFormatter.format(0.000000125)
         assertEquals("1.25e-7", tiny.lowercase())
 
+        // Microscopic value (< 1e-15)
+        val microscopic = SmartFormatter.format(3.17e-17)
+        assertEquals("3.17e-17", microscopic.lowercase())
+
         // Greater than 1e9
         val huge = SmartFormatter.format(2500000000.0)
         assertEquals("2.5e9", huge.lowercase())

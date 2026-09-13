@@ -45,19 +45,17 @@ fun UnitCalculatorScreen(
     var unitTab by remember { mutableStateOf(defaultTab) }
     var currentCategory by remember { mutableStateOf(UnitCategory.LENGTH) }
 
-    val initialUnits = unitsByCategory(currentCategory)
+    val units = unitsByCategory(currentCategory)
     var fromUnit by remember {
         mutableStateOf<UnitItemUI?>(
-            initialUnits.firstOrNull { it.lable == "m" } ?: initialUnits.firstOrNull()
+            units.firstOrNull { it.lable == "m" } ?: units.firstOrNull()
         )
     }
     var toUnit by remember {
         mutableStateOf<UnitItemUI?>(
-            initialUnits.firstOrNull { it.lable == "cm" } ?: initialUnits.getOrNull(1) ?: initialUnits.firstOrNull()
+            units.firstOrNull { it.lable == "cm" } ?: units.getOrNull(1) ?: units.firstOrNull()
         )
     }
-
-    val units = unitsByCategory(currentCategory)
 
     var activeField by remember { mutableStateOf(ActiveField.FROM) }
     var unitPickerFor by remember { mutableStateOf<ActiveField?>(null) }

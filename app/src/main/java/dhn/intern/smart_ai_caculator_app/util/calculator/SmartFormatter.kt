@@ -20,7 +20,7 @@ object SmartFormatter {
      */
     fun format(value: Double, maxSignificantDigits: Int = 7): String {
         if (value.isNaN() || value.isInfinite()) return "0"
-        if (value == 0.0 || abs(value) < 1e-15) return "0"
+        if (value == 0.0) return "0"
 
         val absVal = abs(value)
 
