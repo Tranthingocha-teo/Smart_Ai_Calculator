@@ -34,3 +34,17 @@ Whenever an agent picks up a ticket `#<issue_number>` to implement:
 2. **TDD**: Write failing unit tests first, implement the minimal solution, refactor, and verify `./gradlew testDebugUnitTest`.
 3. **Commit**: Use Conventional Commits with issue reference: `feat(<scope>): <description> (closes #<issue_number>)`.
 4. **Pull Request**: Push branch to origin and open a PR via `gh pr create` following `.github/pull_request_template.md` with `Closes #<issue_number>`. Leave the PR open for user review.
+
+## Development Team Members & Task Assignment
+
+The project is developed by a 3-member engineering team:
+- **Trần Thị Ngọc Hà** ([`@Tranthingocha-teo`](https://github.com/Tranthingocha-teo)): Team Lead / Architecture / Core Engines & UI Navigation.
+- **Đinh Thị Ánh Sáng** ([`@dinhthianhsang`](https://github.com/dinhthianhsang)): Software Engineer / Math Calculation Engines, Scientific Algorithms & UI Components.
+- **Thùy Dung** ([`@thuyydung`](https://github.com/thuyydung)): Software Engineer / Data Layer, Room Database, Network APIs & History Persistence.
+
+### Multi-Member Task Distribution Rules:
+When tickets are created via `/to-tickets`:
+1. **Balanced Workload**: Distribute tickets across the 3 members according to module affinities and dependencies.
+2. **Parallel Tracks**: Sequence independent tickets concurrently (e.g. Math/Algorithm track for `@dinhthianhsang` and Data/Network track for `@thuyydung`) so teammates do not block each other.
+3. **Automated Assignment**: Automatically assign issues on GitHub via `gh issue edit <number> --add-assignee <username>`.
+4. **Cross-Review**: Assign the remaining team members as reviewers on Pull Requests.

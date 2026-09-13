@@ -2,6 +2,11 @@
 
 Chào mừng bạn đến với đội ngũ phát triển **Smart AI Calculator**! Tài liệu này quy định toàn bộ quy trình làm việc chung (Git Workflow, Task Management, Testing, và Code Review) nhằm đảm bảo cả nhóm phối hợp nhịp nhàng, code luôn sạch và không bao giờ gặp xung đột làm vỡ nhánh chính (`main`).
 
+### 👥 Đội ngũ phát triển (Development Team)
+- **Trần Thị Ngọc Hà** ([`@Tranthingocha-teo`](https://github.com/Tranthingocha-teo)) — Team Lead / Architecture / Core Engines & UI Navigation
+- **Đinh Thị Ánh Sáng** ([`@dinhthianhsang`](https://github.com/dinhthianhsang)) — Software Engineer / Math Calculation Engines, Scientific Algorithms & UI
+- **Thùy Dung** ([`@thuyydung`](https://github.com/thuyydung)) — Software Engineer / Data Layer, Room Database, Network APIs & History Persistence
+
 ---
 
 ## 📌 1. Quản Lý Tiến Độ & Nhận Việc (Task Management)
