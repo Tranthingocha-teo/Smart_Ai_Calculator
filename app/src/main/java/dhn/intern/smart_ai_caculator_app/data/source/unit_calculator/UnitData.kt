@@ -48,6 +48,48 @@ object UnitData {
                 navHost = "data_unit_converter",
                 category = UnitCategory.DATA
             ),
+            UnitUi(
+                image = null,
+                iconText = "🚀",
+                title = R.string.unit_calculator_speed,
+                navHost = "speed_unit_converter",
+                category = UnitCategory.SPEED
+            ),
+            UnitUi(
+                image = null,
+                iconText = "🔘",
+                title = R.string.unit_calculator_pressure,
+                navHost = "pressure_unit_converter",
+                category = UnitCategory.PRESSURE
+            ),
+            UnitUi(
+                image = null,
+                iconText = "⚡",
+                title = R.string.unit_calculator_power,
+                navHost = "power_unit_converter",
+                category = UnitCategory.POWER
+            ),
+            UnitUi(
+                image = null,
+                iconText = "🔋",
+                title = R.string.unit_calculator_energy,
+                navHost = "energy_unit_converter",
+                category = UnitCategory.ENERGY
+            ),
+            UnitUi(
+                image = null,
+                iconText = "📐",
+                title = R.string.unit_calculator_angle,
+                navHost = "angle_unit_converter",
+                category = UnitCategory.ANGLE
+            ),
+            UnitUi(
+                image = null,
+                iconText = "⛽",
+                title = R.string.unit_calculator_fuel,
+                navHost = "fuel_unit_converter",
+                category = UnitCategory.FUEL
+            )
         )
     }
 }

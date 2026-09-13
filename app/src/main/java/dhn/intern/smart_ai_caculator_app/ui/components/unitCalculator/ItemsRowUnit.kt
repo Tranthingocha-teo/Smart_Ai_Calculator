@@ -49,7 +49,7 @@ fun ItemsRowUnit(
                 title = item.title,
                 isSelected = unitTab == item,
                 onClick = {
-                    onSelectUnitTab(item, item.toCategory())
+                    onSelectUnitTab(item, item.category)
                 }
             )
             Spacer(modifier = Modifier.width(15.dp))

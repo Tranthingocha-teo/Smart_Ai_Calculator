@@ -32,6 +32,8 @@ import dhn.intern.smart_ai_caculator_app.ui.components.keypad.UnitKeypad
 import dhn.intern.smart_ai_caculator_app.ui.components.keypad.handleInput
 import dhn.intern.smart_ai_caculator_app.ui.components.unitCalculator.ItemsRowUnit
 import dhn.intern.smart_ai_caculator_app.ui.components.unitCalculator.UnitInputField
+import dhn.intern.smart_ai_caculator_app.util.calculator.SmartFormatter
+import dhn.intern.smart_ai_caculator_app.util.calculator.UnitConverterUtil
 
 @Composable
 fun UnitCalculatorScreen(
@@ -41,17 +43,70 @@ fun UnitCalculatorScreen(
     val defaultTab = UnitData.getUnitData()
         .first { it.navHost == "length_unit_converter" }
     var unitTab by remember { mutableStateOf(defaultTab) }
-    var fromUnit by remember { mutableStateOf<UnitItemUI?>(null) }
-    var toUnit by remember { mutableStateOf<UnitItemUI?>(null) }
     var currentCategory by remember { mutableStateOf(UnitCategory.LENGTH) }
 
     val units = unitsByCategory(currentCategory)
+    var fromUnit by remember {
+        mutableStateOf<UnitItemUI?>(
+            units.firstOrNull { it.lable == "m" } ?: units.firstOrNull()
+        )
+    }
+    var toUnit by remember {
+        mutableStateOf<UnitItemUI?>(
+            units.firstOrNull { it.lable == "cm" } ?: units.getOrNull(1) ?: units.firstOrNull()
+        )
+    }
 
     var activeField by remember { mutableStateOf(ActiveField.FROM) }
     var unitPickerFor by remember { mutableStateOf<ActiveField?>(null) }
 
-    var fromValue by remember { mutableStateOf("0.0") }
-    var toValue by remember { mutableStateOf("0.0") }
+    var fromValue by remember { mutableStateOf("1") }
+    var toValue by remember {
+        val initialConverted = if (fromUnit != null && toUnit != null) {
+            SmartFormatter.format(
+                UnitConverterUtil.convert(1.0, fromUnit!!.lable, toUnit!!.lable, currentCategory)
+            )
+        } else {
+            "0"
+        }
+        mutableStateOf(initialConverted)
+    }
+
+    fun recalculate(sourceField: ActiveField, sourceValue: String) {
+        val num = sourceValue.toDoubleOrNull()
+        if (num == null) {
+            when (sourceField) {
+                ActiveField.FROM -> toValue = "0"
+                ActiveField.TO -> fromValue = "0"
+                else -> {}
+            }
+            return
+        }
+
+        if (fromUnit == null || toUnit == null) return
+
+        when (sourceField) {
+            ActiveField.FROM -> {
+                val converted = UnitConverterUtil.convert(
+                    value = num,
+                    fromUnitId = fromUnit!!.lable,
+                    toUnitId = toUnit!!.lable,
+                    category = currentCategory
+                )
+                toValue = SmartFormatter.format(converted)
+            }
+            ActiveField.TO -> {
+                val converted = UnitConverterUtil.convert(
+                    value = num,
+                    fromUnitId = toUnit!!.lable,
+                    toUnitId = fromUnit!!.lable,
+                    category = currentCategory
+                )
+                fromValue = SmartFormatter.format(converted)
+            }
+            else -> {}
+        }
+    }
 
     val fromLabel = if (fromUnit == null) {
         stringResource(R.string.unit_calculator_please_choose)
@@ -63,7 +118,6 @@ fun UnitCalculatorScreen(
     } else {
         "${toUnit!!.lable} (${toUnit!!.des})"
     }
-
 
     Scaffold(
         modifier = Modifier
@@ -80,7 +134,7 @@ fun UnitCalculatorScreen(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.primary)
                 .padding(paddingValues)
-        ){
+        ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -91,8 +145,11 @@ fun UnitCalculatorScreen(
                     onSelectUnitTab = { selectedUnitTab, selectedCategory ->
                         unitTab = selectedUnitTab
                         currentCategory = selectedCategory
-                        fromUnit = null
-                        toUnit = null
+                        val categoryUnits = unitsByCategory(selectedCategory)
+                        fromUnit = categoryUnits.firstOrNull()
+                        toUnit = categoryUnits.getOrNull(1) ?: categoryUnits.firstOrNull()
+                        fromValue = "1"
+                        recalculate(ActiveField.FROM, "1")
                     }
                 )
                 Spacer(modifier = Modifier.height(15.dp))
@@ -137,36 +194,33 @@ fun UnitCalculatorScreen(
                                 val tmpUnit = fromUnit
                                 fromUnit = toUnit
                                 toUnit = tmpUnit
-
-                                activeField = when (activeField) {
-                                    ActiveField.FROM -> ActiveField.TO
-                                    ActiveField.TO -> ActiveField.FROM
-                                    else -> {
-                                        ActiveField.FROM
-                                    }
-                                }
                             }
 
                             else -> {
                                 when (activeField) {
-                                    ActiveField.FROM ->
+                                    ActiveField.FROM -> {
                                         fromValue = handleInput(fromValue, key)
+                                        recalculate(ActiveField.FROM, fromValue)
+                                    }
 
-                                    ActiveField.TO ->
+                                    ActiveField.TO -> {
                                         toValue = handleInput(toValue, key)
+                                        recalculate(ActiveField.TO, toValue)
+                                    }
 
                                     else -> {
                                         fromValue = handleInput(fromValue, key)
+                                        recalculate(ActiveField.FROM, fromValue)
                                     }
                                 }
                             }
                         }
                     }
                 )
-
             }
         }
     }
+
     if (showUnitPicker) {
         UnitPickerBottomSheet(
             title = R.string.unit_calculator_choose,
@@ -178,8 +232,14 @@ fun UnitCalculatorScreen(
             },
             onSelect = { unit ->
                 when (unitPickerFor) {
-                    ActiveField.FROM -> fromUnit = unit
-                    ActiveField.TO -> toUnit = unit
+                    ActiveField.FROM -> {
+                        fromUnit = unit
+                        recalculate(ActiveField.TO, toValue)
+                    }
+                    ActiveField.TO -> {
+                        toUnit = unit
+                        recalculate(ActiveField.FROM, fromValue)
+                    }
                     else -> {}
                 }
                 showUnitPicker = false
@@ -189,6 +249,4 @@ fun UnitCalculatorScreen(
             }
         )
     }
-
-
 }
