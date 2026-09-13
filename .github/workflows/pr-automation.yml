@@ -2,7 +2,7 @@ name: PR Automation & Team Assistant
 
 on:
   pull_request:
-    types: [opened, ready_for_review]
+    types: [opened, edited, ready_for_review]
 
 permissions:
   pull-requests: write
@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   pr_assistant:
-    name: Setup Reviewers & Verify Linked Issue
+    name: Setup Reviewers, Validate Title & Linked Issue
     runs-on: ubuntu-latest
     steps:
       - name: Auto-assign Team Reviewers & Validate PR
@@ -20,43 +20,64 @@ jobs:
           script: |
             const pr = context.payload.pull_request;
             const author = pr.user.login;
+            const title = pr.title.trim();
+            const body = pr.body || '';
             const teamMembers = ['Tranthingocha-teo', 'dinhthianhsang', 'thuyydung'];
             
-            // 1. Assign other team members as reviewers
-            const reviewersToAssign = teamMembers.filter(member => member !== author);
-            if (reviewersToAssign.length > 0) {
+            // 1. Assign other team members as reviewers (only on open)
+            if (context.payload.action === 'opened' || context.payload.action === 'ready_for_review') {
+              const reviewersToAssign = teamMembers.filter(member => member !== author);
+              if (reviewersToAssign.length > 0) {
+                try {
+                  await github.rest.pulls.requestReviewers({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    pull_number: pr.number,
+                    reviewers: reviewersToAssign
+                  });
+                  console.log(`Successfully assigned reviewers: ${reviewersToAssign.join(', ')}`);
+                } catch (error) {
+                  console.log(`Could not assign reviewers (might lack permissions or pending invite): ${error.message}`);
+                }
+              }
+
+              // Add 'needs-review' label
               try {
-                await github.rest.pulls.requestReviewers({
+                await github.rest.issues.addLabels({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
-                  pull_number: pr.number,
-                  reviewers: reviewersToAssign
+                  issue_number: pr.number,
+                  labels: ['needs-review']
                 });
-                console.log(`Successfully assigned reviewers: ${reviewersToAssign.join(', ')}`);
               } catch (error) {
-                console.log(`Could not assign reviewers (might lack permissions or pending invite): ${error.message}`);
+                console.log(`Could not add label: ${error.message}`);
               }
             }
 
-            // 2. Add 'needs-review' label
-            try {
-              await github.rest.issues.addLabels({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: pr.number,
-                labels: ['needs-review']
-              });
-            } catch (error) {
-              console.log(`Could not add label: ${error.message}`);
+            // 2. Validate PR Title against Conventional Commits
+            const conventionalCommitRegex = /^(feat|fix|test|docs|refactor|perf|chore|ci)(\([a-z0-9_.-]+\))?:\s.+/i;
+            const isTitleValid = conventionalCommitRegex.test(title);
+            
+            // 3. Check for linked Issue in PR body
+            const hasIssueLink = /closes\s+#\d+|fixes\s+#\d+|resolves\s+#\d+/i.test(body);
+
+            // Construct friendly feedback if anything is missing
+            const feedbackNotes = [];
+            if (!isTitleValid) {
+              feedbackNotes.push(`❌ **Tiêu đề PR chưa đúng chuẩn Conventional Commits**:\n` +
+                `   - Tiêu đề hiện tại: \`${title}\`\n` +
+                `   - Chuẩn khuyến nghị: \`<type>(<scope>): <mô tả ngắn>\` (Ví dụ: \`feat(calculator): implement temperature engine\` hoặc \`fix(currency): handle timeout\`).`);
+            }
+            if (!hasIssueLink) {
+              feedbackNotes.push(`⚠️ **Chưa tìm thấy từ khóa liên kết Issue**:\n` +
+                `   - Hãy thêm dòng \`Closes #<mã_issue>\` (ví dụ: \`Closes #29\`, \`Closes #30\`) vào phần mô tả PR để tự động cập nhật thẻ trên [Roadmap Board](https://github.com/users/Tranthingocha-teo/projects/1).`);
             }
 
-            // 3. Check for linked Issue in PR body
-            const body = pr.body || '';
-            const hasIssueLink = /closes\s+#\d+|fixes\s+#\d+|resolves\s+#\d+/i.test(body);
-            if (!hasIssueLink) {
+            if (feedbackNotes.length > 0) {
               const friendlyComment = `👋 Chào @${author}!\n\n` +
-                `Nhắc nhở nhẹ từ bot: Pull Request này dường như chưa có từ khóa liên kết Issue (ví dụ: \`Closes #29\`, \`Closes #30\`, v.v.).\n\n` +
-                `💡 Bạn hãy chỉnh sửa mô tả PR và thêm dòng \`Closes #<mã_issue>\` để GitHub tự động đóng thẻ công việc trên [Roadmap Board](https://github.com/users/Tranthingocha-teo/projects/1) khi PR được merge nhé! Cảm ơn bạn! 🎉`;
+                `Trợ lý bot phát hiện một số điểm cần lưu ý để PR của bạn chuẩn chỉ hơn:\n\n` +
+                feedbackNotes.join('\n\n') + '\n\n' +
+                `💡 *Bạn hãy bấm Edit tiêu đề/mô tả PR để sửa lại nhé. Cảm ơn bạn rất nhiều!* 🎉`;
               
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
