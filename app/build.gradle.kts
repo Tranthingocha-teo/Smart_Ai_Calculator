@@ -62,11 +62,11 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
     // Koin core
-    implementation("io.insert-koin:koin-core:3.5.6")
+    implementation("io.insert-koin:koin-core:4.2.2")
     // Koin Android
-    implementation("io.insert-koin:koin-android:3.5.6")
+    implementation("io.insert-koin:koin-android:4.2.2")
     // Koin for Jetpack Compose
-    implementation("io.insert-koin:koin-androidx-compose:3.5.6")
+    implementation("io.insert-koin:koin-androidx-compose:4.2.2")
     //DataStore
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation("androidx.appcompat:appcompat:1.7.0")
