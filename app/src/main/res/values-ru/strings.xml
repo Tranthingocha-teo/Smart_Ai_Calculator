@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">Умный AI Калькулятор</string>
+
+    <string name="title_ai_calculator">AI Калькулятор</string>
+
+    <string name="menu_basic_calculator">Базовый калькулятор</string>
+    <string name="menu_ai_calculator">AI калькулятор</string>
+    <string name="menu_unit_converter">Конвертер единиц</string>
+    <string name="menu_currency_converter">Конвертер валют</string>
+    <string name="menu_discount_calculator">Калькулятор скидок</string>
+    <string name="menu_tip_calculator">Калькулятор чаевых</string>
+    <string name="menu_date_calculator">Калькулятор дат</string>
+    <string name="menu_loan_calculator">Калькулятор кредита</string>
+    <string name="menu_gpa_calculator">Калькулятор GPA</string>
+    <string name="menu_bmi_calculator">Калькулятор BMI</string>
+
+    <string name="select_language">Выбрать язык</string>
+
+    <string name="language_english">Английский</string>
+    <string name="language_chinese">Китайский</string>
+    <string name="language_hindi">Хинди</string>
+    <string name="language_french">Французский</string>
+    <string name="language_arabic">Арабский</string>
+    <string name="language_italian">Итальянский</string>
+    <string name="language_spanish">Испанский</string>
+    <string name="language_bengali">Бенгальский</string>
+    <string name="language_russian">Русский</string>
+    <string name="language_portuguese">Португальский</string>
+</resources>

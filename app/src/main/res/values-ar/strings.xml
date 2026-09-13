@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">آلة حاسبة ذكية بالذكاء الاصطناعي</string>
+
+    <string name="title_ai_calculator">آلة حاسبة بالذكاء الاصطناعي</string>
+
+    <string name="menu_basic_calculator">آلة حاسبة أساسية</string>
+    <string name="menu_ai_calculator">آلة حاسبة بالذكاء الاصطناعي</string>
+    <string name="menu_unit_converter">محول الوحدات</string>
+    <string name="menu_currency_converter">محول العملات</string>
+    <string name="menu_discount_calculator">حاسبة الخصم</string>
+    <string name="menu_tip_calculator">حاسبة الإكرامية</string>
+    <string name="menu_date_calculator">حاسبة التاريخ</string>
+    <string name="menu_loan_calculator">حاسبة القرض</string>
+    <string name="menu_gpa_calculator">حاسبة GPA</string>
+    <string name="menu_bmi_calculator">حاسبة BMI</string>
+
+    <string name="select_language">اختر اللغة</string>
+
+    <string name="language_english">الإنجليزية</string>
+    <string name="language_chinese">الصينية</string>
+    <string name="language_hindi">الهندية</string>
+    <string name="language_french">الفرنسية</string>
+    <string name="language_arabic">العربية</string>
+    <string name="language_italian">الإيطالية</string>
+    <string name="language_spanish">الإسبانية</string>
+    <string name="language_bengali">البنغالية</string>
+    <string name="language_russian">الروسية</string>
+    <string name="language_portuguese">البرتغالية</string>
+</resources>

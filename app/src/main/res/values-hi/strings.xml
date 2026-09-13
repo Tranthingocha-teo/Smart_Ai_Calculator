@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">स्मार्ट AI कैलकुलेटर</string>
+
+    <string name="title_ai_calculator">AI कैलकुलेटर</string>
+
+    <string name="menu_basic_calculator">बुनियादी कैलकुलेटर</string>
+    <string name="menu_ai_calculator">AI कैलकुलेटर</string>
+    <string name="menu_unit_converter">इकाई परिवर्तक</string>
+    <string name="menu_currency_converter">मुद्रा परिवर्तक</string>
+    <string name="menu_discount_calculator">छूट कैलकुलेटर</string>
+    <string name="menu_tip_calculator">टिप कैलकुलेटर</string>
+    <string name="menu_date_calculator">तिथि कैलकुलेटर</string>
+    <string name="menu_loan_calculator">ऋण कैलकुलेटर</string>
+    <string name="menu_gpa_calculator">GPA कैलकुलेटर</string>
+    <string name="menu_bmi_calculator">BMI कैलकुलेटर</string>
+
+    <string name="select_language">भाषा चुनें</string>
+
+    <string name="language_english">अंग्रेज़ी</string>
+    <string name="language_chinese">चीनी</string>
+    <string name="language_hindi">हिंदी</string>
+    <string name="language_french">फ्रेंच</string>
+    <string name="language_arabic">अरबी</string>
+    <string name="language_italian">इतालवी</string>
+    <string name="language_spanish">स्पेनिश</string>
+    <string name="language_bengali">बंगाली</string>
+    <string name="language_russian">रूसी</string>
+    <string name="language_portuguese">पुर्तगाली</string>
+</resources>

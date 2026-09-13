@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">Calculatrice IA Intelligente</string>
+
+    <string name="title_ai_calculator">Calculatrice IA</string>
+
+    <string name="menu_basic_calculator">Calculatrice basique</string>
+    <string name="menu_ai_calculator">Calculatrice IA</string>
+    <string name="menu_unit_converter">Convertisseur d’unités</string>
+    <string name="menu_currency_converter">Convertisseur de devises</string>
+    <string name="menu_discount_calculator">Calculateur de remise</string>
+    <string name="menu_tip_calculator">Calculateur de pourboire</string>
+    <string name="menu_date_calculator">Calculateur de date</string>
+    <string name="menu_loan_calculator">Calculateur de prêt</string>
+    <string name="menu_gpa_calculator">Calculateur GPA</string>
+    <string name="menu_bmi_calculator">Calculateur IMC</string>
+
+    <string name="select_language">Choisir la langue</string>
+
+    <string name="language_english">Anglais</string>
+    <string name="language_chinese">Chinois</string>
+    <string name="language_hindi">Hindi</string>
+    <string name="language_french">Français</string>
+    <string name="language_arabic">Arabe</string>
+    <string name="language_italian">Italien</string>
+    <string name="language_spanish">Espagnol</string>
+    <string name="language_bengali">Bengali</string>
+    <string name="language_russian">Russe</string>
+    <string name="language_portuguese">Portugais</string>
+</resources>

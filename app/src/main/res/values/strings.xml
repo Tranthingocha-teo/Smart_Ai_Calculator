@@ -1,0 +1,189 @@
+<resources>
+    <!-- App -->
+    <string name="app_name">Smart AI Calculator</string>
+
+    <!-- Home -->
+    <string name="title_ai_calculator">AI Calculator</string>
+
+    <!-- Calculator menu -->
+    <string name="menu_basic_calculator">Basic Calculator</string>
+    <string name="menu_ai_calculator">AI Calculator</string>
+    <string name="menu_unit_converter">Unit Converter</string>
+    <string name="menu_currency_converter">Currency Converter</string>
+    <string name="menu_discount_calculator">Discount Calculator</string>
+    <string name="menu_tip_calculator">Tip Calculator</string>
+    <string name="menu_date_calculator">Date Calculator</string>
+    <string name="menu_loan_calculator">Loan Calculator</string>
+    <string name="menu_gpa_calculator">GPA Calculator</string>
+    <string name="menu_bmi_calculator">BMI Calculator</string>
+
+    <!-- Select Language -->
+    <string name="select_language">Select Language</string>
+
+    <!-- Languages -->
+    <string name="language_english">English</string>
+    <string name="language_chinese">Chinese</string>
+    <string name="language_hindi">Hindi</string>
+    <string name="language_french">French</string>
+    <string name="language_arabic">Arabic</string>
+    <string name="language_italian">Italian</string>
+    <string name="language_spanish">Spanish</string>
+    <string name="language_bengali">Bengali</string>
+    <string name="language_russian">Russian</string>
+    <string name="language_portuguese">Portuguese</string>
+
+    <!-- setting-->
+    <string name="Setting_title">App Setting</string>
+    <string name="Setting_personalization">Personalization</string>
+    <string name="Setting_language">Language</string>
+    <string name="Setting_app_theme">App Theme</string>
+    <string name="Setting_system">App system</string>
+    <string name="Setting_comunicate">Comunicate</string>
+    <string name="Setting_feedback">FeedBack</string>
+    <string name="Setting_feedback_share">Share your feedback</string>
+    <string name="Setting_privacy_policy">Privacy Policy</string>
+    <string name="Setting_your_data">See how we protect your data</string>
+    <string name="Setting_others">Others</string>
+    <string name="Setting_share_app">Share App</string>
+    <string name="Setting_share_friend">Share with your friends</string>
+    <string name="Setting_rate_us">Rate Us</string>
+    <string name="Setting_give_your_rating">Give us your rating </string>
+    <string name="Setting_about_us">About Us</string>
+    <string name="Setting_know_about_us">Know more about us</string>
+    <string name="version_name_app">Version App: %1$s</string>
+    
+    <!-- basic_calculator-->
+    <string name="Basic_caculator_simple">Simple</string>
+    <string name="Basic_caculator_scientific">Scientific</string>
+    <string name="Basic_caculator_history">History</string>
+    <string name="Basic_caculator_ac">AC</string>
+
+    <!-- History bottom sheets   -->
+    <string name="history_bottom_insert_formula">Insert Formula</string>
+    <string name="history_bottom_replace">Replace</string>
+    <string name="history_bottom_copy_resulit">Copy result</string>
+    <string name="history_bottom_delete">Delete</string>
+
+    <!-- AI Calculator-->
+    <string name="ai_calculator_title">AI Scan</string>
+    <string name="ai_calculator_scan">Scan</string>
+    <string name="ai_calculator_chat">Chat</string>
+    <string name="ai_calculator_input_placeholder">Ask me anything...</string>
+    <string name="ai_calculator_no_requesting">Requesting camera permission...</string>
+    <string name="ai_calculator_block_permission">Camera permission is required to show the preview. Grant it in settings if blocked.</string>
+    <string name="ai_calculator_open_setting">Open App Settings</string>
+    <string name="ai_calculator_text_field">Ask any thing to your ai assistant...</string>
+    <string name="ai_calculator_generating">Generating result...</string>
+    <string name="ai_calculator_copy">Copy</string>
+    <string name="ai_calculator_rewrite">Rewrite</string>
+    <string name="ai_calculator_user">User</string>
+
+    <!-- Unit Calculator-->
+    <string name="unit_calculator_length">Length</string>
+    <string name="unit_calculator_mass">Mass</string>
+    <string name="unit_calculator_area">Area</string>
+    <string name="unit_calculator_volume">Volume</string>
+    <string name="unit_calculator_time">Time</string>
+    <string name="unit_calculator_data">Data</string>
+    <string name="unit_calculator_choose">Choose Unit</string>
+    <string name="unit_calculator_please_choose">Choose Unit Please</string>
+
+    <!--Currencies Converter-->
+    <string name="currencies_please_choose">Choose currency Please</string>
+    <string name="currencies_choose">Choose currency</string>
+    <string name="currencies_search">Search currency</string>
+
+    <!--Discount Calculator-->
+    <string name="discount_calculator_split">Split With</string>
+    <string name="discount_calculator_results">Results</string>
+    <string name="discount_calculator_amount_saved">Amount Saved</string>
+    <string name="discount_calculator_tax">Tax</string>
+    <string name="discount_calculator_final_prices">Final Prices</string>
+
+    <!--BMI Calculator-->
+    <string name="bmi_weight">Weight (kg)</string>
+    <string name="bmi_height">Height (ft-in)</string>
+    <string name="bmi_age">Age</string>
+    <string name="bmi_gender">Gender</string>
+    <string name="bmi_male">Male</string>
+    <string name="bmi_female">Female</string>
+    <string name="bmi_calculate">Calculate</string>
+    <string name="bmi_calculator_your_bmi">Your BMI is...</string>
+    <string name="bmi_calculator_16">Very severely underweight</string>
+    <string name="bmi_calculator_16_9">Severely underweight</string>
+    <string name="bmi_calculator_18">Underweight</string>
+    <string name="bmi_calculator_20">Normal</string>
+    <string name="bmi_calculator_28">Overweight</string>
+    <string name="bmi_calculator_obese_i">Obese Class I</string>
+    <string name="bmi_calculator_obese_ii">Obese Class II</string>
+    <string name="bmi_calculator_obese_iii">Obese Class III</string>
+
+
+
+
+
+
+
+
+    <!-- Tip Calculator -->
+    <string name="tip_calculator_title">Tip</string>
+    <string name="tip_calculator_tip_on">Tip on</string>
+    <string name="tip_calculator_post_tax">Post-tax</string>
+    <string name="tip_calculator_pre_tax">Pre-tax</string>
+    <string name="tip_calculator_bill">Bill</string>
+    <string name="tip_calculator_people">People</string>
+    <string name="tip_calculator_tip_percentage">Tip (Percentage)</string>
+    <string name="tip_calculator_tax_percentage">Tax (Percentage)</string>
+    <string name="tip_calculator_results">Results</string>
+    <string name="tip_calculator_total">Total</string>
+    <string name="tip_calculator_total_per_person">Total per person</string>
+    <string name="tip_calculator_tip">Tip</string>
+    <string name="tip_calculator_tip_per_person">Tip per person</string>
+
+    <!-- Date Calculator -->
+    <string name="date_calculator_title">Date</string>
+    <string name="date_calculator_tab_start_date">Start Date</string>
+    <string name="date_calculator_tab_from_to">From/To</string>
+    <string name="date_calculator_start_date">Start Date</string>
+    <string name="date_calculator_end_date">End Date</string>
+    <string name="date_calculator_calculate_duration">Calculate Duration</string>
+    <string name="date_calculator_results_days">Results in (days)</string>
+    <string name="date_calculator_results_weeks">Results in (Weeks)</string>
+    <string name="date_calculator_results_years">Results in (Years)</string>
+    <string name="date_calculator_days">days</string>
+    <string name="date_calculator_weeks">weeks</string>
+    <string name="date_calculator_years">years</string>
+    <string name="date_calculator_add">Add (+)</string>
+    <string name="date_calculator_subtract">Subtract (-)</string>
+    <string name="date_calculator_months">Months</string>
+    <string name="date_calculator_target_date">Target Date</string>
+    <string name="date_calculator_calculate">Calculate</string>
+
+    <!-- Loan Calculator -->
+    <string name="loan_calculator_title">Loan</string>
+    <string name="loan_calculator_repayment_method">Repayment Method</string>
+    <string name="loan_calculator_equal_principal">Equal Principal Payment</string>
+    <string name="loan_calculator_equal_principal_interest">Equal Principal &amp; Interest</string>
+    <string name="loan_calculator_principal">Loan Principal</string>
+    <string name="loan_calculator_interest">Interest</string>
+    <string name="loan_calculator_term">Term (Months)</string>
+    <string name="loan_calculator_results">Results</string>
+    <string name="loan_calculator_total">Total</string>
+    <string name="loan_calculator_monthly_payment">Monthly Payment</string>
+    <string name="loan_calculator_total_interest">Total Interest</string>
+
+    <!-- GPA Calculator -->
+    <string name="gpa_calculator_title">GPA Calculator</string>
+    <string name="gpa_calculator_subject_name">Subject Name</string>
+    <string name="gpa_calculator_credits">Credits</string>
+    <string name="gpa_calculator_grades">Grades</string>
+    <string name="gpa_calculator_add_subject">Add Subject</string>
+    <string name="gpa_calculator_edit_subject">Edit Subject</string>
+    <string name="gpa_calculator_results">Results</string>
+    <string name="gpa_calculator_gpa">GPA</string>
+    <string name="gpa_calculator_save">Save</string>
+    <string name="gpa_calculator_cancel">Cancel</string>
+    <string name="gpa_calculator_delete">Delete</string>
+    <string name="gpa_calculator_clear_all">Clear All Subjects?</string>
+    <string name="gpa_calculator_clear_all_confirm">Are you sure you want to delete all subjects?</string>
+</resources>

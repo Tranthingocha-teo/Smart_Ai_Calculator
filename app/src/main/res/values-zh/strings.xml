@@ -1,0 +1,34 @@
+<resources>
+    <!-- App -->
+    <string name="app_name">智能AI计算器</string>
+
+    <!-- Home -->
+    <string name="title_ai_calculator">AI计算器</string>
+
+    <!-- Calculator menu -->
+    <string name="menu_basic_calculator">基础计算器</string>
+    <string name="menu_ai_calculator">AI计算器</string>
+    <string name="menu_unit_converter">单位转换器</string>
+    <string name="menu_currency_converter">货币转换器</string>
+    <string name="menu_discount_calculator">折扣计算器</string>
+    <string name="menu_tip_calculator">小费计算器</string>
+    <string name="menu_date_calculator">日期计算器</string>
+    <string name="menu_loan_calculator">贷款计算器</string>
+    <string name="menu_gpa_calculator">GPA计算器</string>
+    <string name="menu_bmi_calculator">BMI计算器</string>
+
+    <!-- Select Language -->
+    <string name="select_language">选择语言</string>
+
+    <!-- Languages -->
+    <string name="language_english">英语</string>
+    <string name="language_chinese">中文</string>
+    <string name="language_hindi">印地语</string>
+    <string name="language_french">法语</string>
+    <string name="language_arabic">阿拉伯语</string>
+    <string name="language_italian">意大利语</string>
+    <string name="language_spanish">西班牙语</string>
+    <string name="language_bengali">孟加拉语</string>
+    <string name="language_russian">俄语</string>
+    <string name="language_portuguese">葡萄牙语</string>
+</resources>
