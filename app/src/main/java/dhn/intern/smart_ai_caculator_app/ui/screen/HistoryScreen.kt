@@ -60,10 +60,12 @@ fun HistoryScreen(
                 .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
             when (source) {
-                HistorySource.CALCULATOR -> {
+                HistorySource.CALCULATOR,
+                HistorySource.GRAPHING_CALCULATOR -> {
+                    val filtered = histories.filter { it.source == source.name }
                     LazyColumn {
                         items(
-                            items = histories,
+                            items = filtered,
                             key = { it.id }
                         ) { historyItem ->
                             CaculatorHistory(
@@ -71,12 +73,11 @@ fun HistoryScreen(
                                 onClick = {
                                     selectedHistory = historyItem
                                     showBottomSheet = true
-                                          },
+                                },
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
-
                 }
 
                 HistorySource.AI_CHAT -> {

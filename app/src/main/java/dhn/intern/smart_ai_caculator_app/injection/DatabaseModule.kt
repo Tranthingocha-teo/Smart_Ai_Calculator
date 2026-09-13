@@ -13,7 +13,10 @@ val databaseModule = module {
             androidContext(),
             CalculatorDatabase::class.java,
             "calculator_db"
-        ).build()
+        )
+            .addMigrations(CalculatorDatabase.MIGRATION_1_2)
+            .fallbackToDestructiveMigration(dropAllTables = true)
+            .build()
     }
 
     single { get<CalculatorDatabase>().historyDao() }

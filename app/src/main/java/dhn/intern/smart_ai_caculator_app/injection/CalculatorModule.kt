@@ -23,7 +23,8 @@ val calculatorModule = module {
 
     viewModel {
         GraphingCalculatorViewModel(
-            graphingEngine = get()
+            graphingEngine = get(),
+            historyRepository = get()
         )
     }
 }
