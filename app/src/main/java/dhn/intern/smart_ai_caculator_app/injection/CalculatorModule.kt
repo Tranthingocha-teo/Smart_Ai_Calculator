@@ -1,4 +1,5 @@
 package dhn.intern.smart_ai_caculator_app.injection
+import dhn.intern.smart_ai_caculator_app.data.repository.GraphPresetRepository
 import dhn.intern.smart_ai_caculator_app.domain.calculator.CalculatorEngine
 import dhn.intern.smart_ai_caculator_app.domain.graphing.DefaultGraphingEngine
 import dhn.intern.smart_ai_caculator_app.domain.graphing.GraphingEngine
@@ -12,6 +13,7 @@ val calculatorModule = module {
     // Engine (business logic)
     single { CalculatorEngine() }
     single<GraphingEngine> { DefaultGraphingEngine() }
+    single { GraphPresetRepository() }
 
     // ViewModel
     viewModel {
@@ -23,7 +25,9 @@ val calculatorModule = module {
 
     viewModel {
         GraphingCalculatorViewModel(
-            graphingEngine = get()
+            graphingEngine = get(),
+            historyRepository = get(),
+            presetRepository = get()
         )
     }
 }

@@ -4,6 +4,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import dhn.intern.smart_ai_caculator_app.data.repository.CalculatorHistoryRepository
+import dhn.intern.smart_ai_caculator_app.data.repository.GraphPreset
+import dhn.intern.smart_ai_caculator_app.data.repository.GraphPresetRepository
 import dhn.intern.smart_ai_caculator_app.domain.graphing.CompiledFunction
 import dhn.intern.smart_ai_caculator_app.domain.graphing.CoordinateTransform
 import dhn.intern.smart_ai_caculator_app.domain.graphing.GraphPoint
@@ -11,10 +15,12 @@ import dhn.intern.smart_ai_caculator_app.domain.graphing.GraphingEngine
 import dhn.intern.smart_ai_caculator_app.domain.graphing.SampledCurve
 import dhn.intern.smart_ai_caculator_app.domain.graphing.SpecialPoint
 import dhn.intern.smart_ai_caculator_app.domain.graphing.ViewportBounds
+import dhn.intern.smart_ai_caculator_app.enum.HistorySource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.util.UUID
 import kotlin.math.abs
 
@@ -24,7 +30,20 @@ data class FunctionItem(
     val color: Color,
     val isVisible: Boolean = true,
     val errorMessage: String? = null
-)
+) {
+    val colorHex: String
+        get() {
+            val alpha = (color.alpha * 255).toInt()
+            val red = (color.red * 255).toInt()
+            val green = (color.green * 255).toInt()
+            val blue = (color.blue * 255).toInt()
+            return if (alpha == 255) {
+                String.format("#%02X%02X%02X", red, green, blue)
+            } else {
+                String.format("#%02X%02X%02X%02X", alpha, red, green, blue)
+            }
+        }
+}
 
 data class RenderedCurve(
     val curve: SampledCurve,
@@ -46,7 +65,9 @@ data class GraphingUiState(
 )
 
 class GraphingCalculatorViewModel(
-    private val graphingEngine: GraphingEngine
+    private val graphingEngine: GraphingEngine,
+    private val historyRepository: CalculatorHistoryRepository? = null,
+    private val presetRepository: GraphPresetRepository = GraphPresetRepository()
 ) : ViewModel() {
 
     private val colorPalette = listOf(
@@ -66,8 +87,10 @@ class GraphingCalculatorViewModel(
     )
     val uiState: StateFlow<GraphingUiState> = _uiState.asStateFlow()
 
+    private var isRestoringFromHistory = true
+
     init {
-        recomputeCurves()
+        restoreFromHistoryIfAvailable()
     }
 
     fun onKeyPress(key: String) {
@@ -109,6 +132,7 @@ class GraphingCalculatorViewModel(
             state.copy(functions = updated)
         }
         recomputeCurves()
+        persistActiveFunctions()
     }
 
     fun clearActiveFunction() {
@@ -133,6 +157,7 @@ class GraphingCalculatorViewModel(
             )
         }
         recomputeCurves()
+        persistActiveFunctions()
     }
 
     fun removeFunction(index: Int) {
@@ -149,6 +174,7 @@ class GraphingCalculatorViewModel(
             state.copy(functions = updated, activeFunctionIndex = newActive)
         }
         recomputeCurves()
+        persistActiveFunctions()
     }
 
     fun toggleFunctionVisibility(index: Int) {
@@ -159,6 +185,7 @@ class GraphingCalculatorViewModel(
             state.copy(functions = updated)
         }
         recomputeCurves()
+        persistActiveFunctions()
     }
 
     fun selectFunction(index: Int) {
@@ -320,6 +347,104 @@ class GraphingCalculatorViewModel(
                 renderedCurves = newRenderedCurves,
                 intersections = intersections
             )
+        }
+    }
+
+    fun applyPreset(preset: GraphPreset) {
+        val currentIndex = _uiState.value.activeFunctionIndex
+        if (currentIndex in _uiState.value.functions.indices) {
+            updateFunctionExpression(currentIndex, preset.expression)
+        } else {
+            addFunction(preset.expression)
+        }
+    }
+
+    fun getPresets(): List<GraphPreset> = presetRepository.getPresets()
+
+    private fun restoreFromHistoryIfAvailable() {
+        if (historyRepository == null) {
+            isRestoringFromHistory = false
+            recomputeCurves()
+            return
+        }
+        viewModelScope.launch {
+            try {
+                val savedHistories = historyRepository.getLatestBySource(HistorySource.GRAPHING_CALCULATOR, limit = 5)
+                if (savedHistories.isNotEmpty()) {
+                    val chronological = savedHistories.reversed()
+                    val restored = chronological.mapIndexed { index, entity ->
+                        val color = entity.colorHex?.let { parseHexColor(it) }
+                            ?: colorPalette[index % colorPalette.size]
+                        FunctionItem(
+                            expression = entity.expression,
+                            color = color,
+                            isVisible = entity.isVisible
+                        )
+                    }
+                    val restoredViewport = savedHistories.firstOrNull()?.viewportBounds?.let { parseViewport(it) }
+                    _uiState.update { state ->
+                        state.copy(
+                            functions = restored,
+                            activeFunctionIndex = 0,
+                            viewport = restoredViewport ?: state.viewport
+                        )
+                    }
+                }
+            } catch (_: Exception) {
+                // Keep defaults if failed
+            } finally {
+                isRestoringFromHistory = false
+                recomputeCurves()
+            }
+        }
+    }
+
+    fun persistActiveFunctions() {
+        if (historyRepository == null || isRestoringFromHistory) return
+        val currentFunctions = _uiState.value.functions
+        val viewport = _uiState.value.viewport
+        val viewportStr = "${viewport.minX},${viewport.maxX},${viewport.minY},${viewport.maxY}"
+        viewModelScope.launch {
+            try {
+                historyRepository.clearBySource(HistorySource.GRAPHING_CALCULATOR)
+                for (fn in currentFunctions) {
+                    if (fn.expression.isNotBlank()) {
+                        historyRepository.saveGraphing(
+                            expression = fn.expression,
+                            colorHex = fn.colorHex,
+                            isVisible = fn.isVisible,
+                            viewportBounds = viewportStr
+                        )
+                    }
+                }
+            } catch (_: Exception) {
+                // Ignore failure
+            }
+        }
+    }
+
+    private fun parseHexColor(hex: String): Color {
+        return try {
+            val clean = hex.removePrefix("#")
+            val colorLong = clean.toLong(16)
+            if (clean.length <= 6) {
+                Color(colorLong or 0xFF000000)
+            } else {
+                Color(colorLong)
+            }
+        } catch (_: Exception) {
+            colorPalette[0]
+        }
+    }
+
+    private fun parseViewport(boundsStr: String): ViewportBounds? {
+        return try {
+            val parts = boundsStr.split(",").map { it.trim().toDouble() }
+            if (parts.size == 4) {
+                ViewportBounds(minX = parts[0], maxX = parts[1], minY = parts[2], maxY = parts[3])
+            } else null
+        } catch (_: Exception) {
+            null
         }
     }
 }

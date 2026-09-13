@@ -18,6 +18,9 @@
     <string name="menu_bmi_calculator">BMI Calculator</string>
     <string name="menu_graphing_calculator">Graphing Calculator</string>
     <string name="graphing_title">Graphing Calculator</string>
+    <string name="graphing_presets">Presets</string>
+    <string name="graphing_presets_title">Mathematical Presets</string>
+    <string name="graphing_share">Share Graph</string>
 
     <!-- Select Language -->
     <string name="select_language">Select Language</string>

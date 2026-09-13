@@ -40,10 +40,19 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.layer.drawLayer
+import androidx.compose.ui.graphics.rememberGraphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -55,8 +64,11 @@ import androidx.navigation.NavController
 import dhn.intern.smart_ai_caculator_app.R
 import dhn.intern.smart_ai_caculator_app.ui.components.graphing.CustomMathKeypad
 import dhn.intern.smart_ai_caculator_app.ui.components.graphing.GraphCanvas
+import dhn.intern.smart_ai_caculator_app.ui.components.graphing.PresetBottomSheet
 import dhn.intern.smart_ai_caculator_app.ui.viewmodel.FunctionItem
 import dhn.intern.smart_ai_caculator_app.ui.viewmodel.GraphingCalculatorViewModel
+import dhn.intern.smart_ai_caculator_app.util.graphing.GraphImageExporter
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,6 +79,10 @@ fun GraphingCalculatorScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val activeFunction = uiState.functions.getOrNull(uiState.activeFunctionIndex)
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val graphicsLayer = rememberGraphicsLayer()
+    var showPresetSheet by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -87,6 +103,27 @@ fun GraphingCalculatorScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = { showPresetSheet = true }) {
+                        Icon(
+                            painter = painterResource(R.drawable.library),
+                            contentDescription = stringResource(R.string.graphing_presets),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    IconButton(onClick = {
+                        coroutineScope.launch {
+                            try {
+                                val bitmap = graphicsLayer.toImageBitmap().asAndroidBitmap()
+                                GraphImageExporter.shareGraphImage(context, bitmap)
+                            } catch (_: Exception) {}
+                        }
+                    }) {
+                        Icon(
+                            painter = painterResource(R.drawable.share),
+                            contentDescription = stringResource(R.string.graphing_share),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
                     IconButton(onClick = { viewModel.resetViewport() }) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
@@ -142,6 +179,12 @@ fun GraphingCalculatorScreen(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
+                    .drawWithContent {
+                        graphicsLayer.record {
+                            this@drawWithContent.drawContent()
+                        }
+                        drawLayer(graphicsLayer)
+                    }
             ) {
                 GraphCanvas(
                     viewport = uiState.viewport,
@@ -205,6 +248,14 @@ fun GraphingCalculatorScreen(
                     onDismiss = { viewModel.setKeypadVisible(false) }
                 )
             }
+        }
+
+        if (showPresetSheet) {
+            PresetBottomSheet(
+                presets = viewModel.getPresets(),
+                onSelectPreset = { preset -> viewModel.applyPreset(preset) },
+                onDismiss = { showPresetSheet = false }
+            )
         }
     }
 }
