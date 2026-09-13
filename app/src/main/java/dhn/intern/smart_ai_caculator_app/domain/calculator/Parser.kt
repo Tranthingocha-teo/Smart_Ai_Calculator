@@ -18,7 +18,7 @@ class Parser {
 
         tokens.forEach { token ->
             when (token) {
-                is Token.Number -> output.add(token)
+                is Token.Number, is Token.Variable -> output.add(token)
 
                 is Token.Function -> stack.add(token)
 
