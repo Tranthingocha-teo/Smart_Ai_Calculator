@@ -26,6 +26,7 @@ import dhn.intern.smart_ai_caculator_app.ui.screen.TipCalculatorScreen
 import dhn.intern.smart_ai_caculator_app.ui.screen.DateCalculatorScreen
 import dhn.intern.smart_ai_caculator_app.ui.screen.LoanCalculatorScreen
 import dhn.intern.smart_ai_caculator_app.ui.screen.GpaCalculatorScreen
+import dhn.intern.smart_ai_caculator_app.ui.screen.GraphingCalculatorScreen
 import dhn.intern.smart_ai_caculator_app.ui.screen.ai_caculator_screen
 import dhn.intern.smart_ai_caculator_app.ui.viewmodel.AppViewModel
 import kotlinx.coroutines.delay
@@ -136,6 +137,11 @@ fun AppNavHost(
             GpaCalculatorScreen(
                 navController = navController,
                 modifier = Modifier
+            )
+        }
+        composable(NavScreen.GraphingCalculatorScreen.route){
+            GraphingCalculatorScreen(
+                navController = navController
             )
         }
 

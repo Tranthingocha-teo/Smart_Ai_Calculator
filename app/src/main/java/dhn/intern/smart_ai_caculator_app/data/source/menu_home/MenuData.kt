@@ -96,7 +96,13 @@ object MenuData {
                 icon = R.drawable.bmi_caculator,
                 navhost = "bmi_caculator"
             ),
-            )
+            MenuUI(
+                code = 11,
+                name = R.string.menu_graphing_calculator,
+                icon = R.drawable.basic_caculator,
+                navhost = NavScreen.GraphingCalculatorScreen.route
+            ),
+        )
 
     }
 
