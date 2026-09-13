@@ -16,4 +16,7 @@ This document defines the ubiquitous domain vocabulary and system context for th
 | **Calculation History** | Local persistent storage using Room Database for past calculations across all calculator engines. | `data/local/` |
 | **Unit Keypad** | Custom on-screen keypad designed for rapid numeric entry without triggering soft keyboard overlays. | `ui/components/UnitKeypad.kt` |
 | **Crop Box Overlay** | Interactive viewport allowing users to isolate single math problems from photos before Gemini analysis. | `ui/components/aiCalculator/` |
+| **Unit & Currency Converter** | Multi-category measurement and foreign exchange conversion engine supporting linear and non-linear unit transformations (Temperature, Speed, etc.) with real-time bidirectional reactivity. | `util/calculator/UnitConverterUtil.kt` |
+| **Smart Precision Formatter** | Dynamic numerical formatting engine maintaining 6-8 significant digits, trailing zero trimming, scientific E-notation for extreme magnitudes, and currency-specific rounding. | `util/calculator/SmartFormatter.kt` |
+| **Exchange Rate Cache** | Local Room-persisted foreign exchange rates fetched from open public APIs with bundled offline fallback and timestamp tracking. | `data/local/` |
 | **Pedagogical Math Response** | 3-tier structured solution format: (1) Final Answer, (2) Step-by-step reasoning, (3) Key formulas. | `domain/ai/` |

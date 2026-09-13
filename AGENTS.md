@@ -26,3 +26,11 @@ Canonical 5-role triage vocabulary. See `docs/agents/triage-labels.md`.
 ### Domain docs
 
 Single-context layout (`CONTEXT.md` + `docs/adr/`). See `docs/agents/domain.md`.
+
+## Development Lifecycle & Git Workflow
+
+Whenever an agent picks up a ticket `#<issue_number>` to implement:
+1. **Branch**: Create and switch to a dedicated branch: `git checkout -b feature/<issue_number>-<slug>` from updated `main`.
+2. **TDD**: Write failing unit tests first, implement the minimal solution, refactor, and verify `./gradlew testDebugUnitTest`.
+3. **Commit**: Use Conventional Commits with issue reference: `feat(<scope>): <description> (closes #<issue_number>)`.
+4. **Pull Request**: Push branch to origin and open a PR via `gh pr create` following `.github/pull_request_template.md` with `Closes #<issue_number>`. Leave the PR open for user review.
