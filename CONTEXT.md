@@ -20,3 +20,8 @@ This document defines the ubiquitous domain vocabulary and system context for th
 | **Smart Precision Formatter** | Dynamic numerical formatting engine maintaining 6-8 significant digits, trailing zero trimming, scientific E-notation for extreme magnitudes, and currency-specific rounding. | `util/calculator/SmartFormatter.kt` |
 | **Exchange Rate Cache** | Local Room-persisted foreign exchange rates fetched from open public APIs with bundled offline fallback and timestamp tracking. | `data/local/` |
 | **Pedagogical Math Response** | 3-tier structured solution format: (1) Final Answer, (2) Step-by-step reasoning, (3) Key formulas. | `domain/ai/` |
+| **Graphing Calculator** | Interactive 2D Cartesian function plotting screen supporting multiple simultaneous curves, dynamic grid lines, pan/pinch-to-zoom gestures, and point tracing with snap detection. | `ui/screen/GraphingCalculatorScreen.kt` |
+| **Graphing Engine** | Pure Kotlin calculation engine handling single-pass postfix tokenization with variable `x`, adaptive pixel-to-math sampling, discontinuity/asymptote detection, and numerical root/extrema/intersection finding. | `domain/graphing/GraphingEngine.kt` |
+| **Custom Math Keypad** | On-screen specialized math input panel for function entry (`x`, `^`, trigonometric functions, roots, logarithms) preventing Android system IME keyboard overlays. | `ui/components/graphing/CustomMathKeypad.kt` |
+| **Graph Image Exporter** | Canvas snapshot rendering and sharing utility exporting high-resolution PNG representations of plotted mathematical functions. | `util/graphing/GraphImageExporter.kt` |
+
