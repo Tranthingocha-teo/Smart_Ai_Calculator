@@ -26,15 +26,23 @@ data class FunctionItem(
     val errorMessage: String? = null
 )
 
+data class RenderedCurve(
+    val curve: SampledCurve,
+    val color: Color,
+    val functionId: String
+)
+
 data class GraphingUiState(
     val functions: List<FunctionItem> = emptyList(),
     val activeFunctionIndex: Int = 0,
     val viewport: ViewportBounds = ViewportBounds(),
     val sampledCurves: List<SampledCurve> = emptyList(),
+    val renderedCurves: List<RenderedCurve> = emptyList(),
     val intersections: List<SpecialPoint> = emptyList(),
     val tracePoint: GraphPoint? = null,
     val traceSpecialPoint: SpecialPoint? = null,
-    val isKeypadVisible: Boolean = true
+    val isKeypadVisible: Boolean = true,
+    val isTraceMode: Boolean = false
 )
 
 class GraphingCalculatorViewModel(
@@ -75,14 +83,18 @@ class GraphingCalculatorViewModel(
                 return
             }
             "Hide" -> {
-                toggleKeypad()
+                setKeypadVisible(false)
                 return
             }
-            "sin", "cos", "tan", "ln", "log", "sqrt" -> "$currentExpr$key("
+            "÷" -> "$currentExpr/"
+            "×" -> "$currentExpr*"
+            "−" -> "$currentExpr-"
+            "sin", "cos", "tan", "ln", "log" -> "$currentExpr$key("
             "√" -> "${currentExpr}sqrt("
             "x²" -> "${currentExpr}x²"
             "x^" -> "${currentExpr}x^"
             "π" -> "${currentExpr}π"
+            "e" -> "${currentExpr}e"
             else -> "$currentExpr$key"
         }
 
@@ -99,6 +111,13 @@ class GraphingCalculatorViewModel(
         recomputeCurves()
     }
 
+    fun clearActiveFunction() {
+        val currentIndex = _uiState.value.activeFunctionIndex
+        if (currentIndex in _uiState.value.functions.indices) {
+            updateFunctionExpression(currentIndex, "")
+        }
+    }
+
     fun addFunction(initialExpression: String = "") {
         _uiState.update { state ->
             if (state.functions.size >= 5) return@update state // limit to 5 functions
@@ -109,7 +128,8 @@ class GraphingCalculatorViewModel(
             )
             state.copy(
                 functions = newFunctions,
-                activeFunctionIndex = newFunctions.lastIndex
+                activeFunctionIndex = newFunctions.lastIndex,
+                isKeypadVisible = true
             )
         }
         recomputeCurves()
@@ -151,6 +171,21 @@ class GraphingCalculatorViewModel(
         _uiState.update { it.copy(isKeypadVisible = !it.isKeypadVisible) }
     }
 
+    fun setKeypadVisible(visible: Boolean) {
+        _uiState.update { it.copy(isKeypadVisible = visible) }
+    }
+
+    fun toggleTraceMode() {
+        _uiState.update {
+            val next = !it.isTraceMode
+            it.copy(isTraceMode = next, tracePoint = if (!next) null else it.tracePoint)
+        }
+    }
+
+    fun clearTracePoint() {
+        _uiState.update { it.copy(tracePoint = null, traceSpecialPoint = null) }
+    }
+
     fun onPan(deltaScreen: Offset, canvasSize: Size) {
         _uiState.update { state ->
             val newViewport = CoordinateTransform.pan(state.viewport, deltaScreen, canvasSize)
@@ -163,6 +198,36 @@ class GraphingCalculatorViewModel(
         _uiState.update { state ->
             val newViewport = CoordinateTransform.zoom(state.viewport, zoomFactor, centerScreen, canvasSize)
             state.copy(viewport = newViewport)
+        }
+        recomputeCurves()
+    }
+
+    fun zoomIn() {
+        _uiState.update { state ->
+            val vp = state.viewport
+            val factor = 0.8
+            val newW = vp.width * factor
+            val newH = vp.height * factor
+            val cx = (vp.minX + vp.maxX) / 2.0
+            val cy = (vp.minY + vp.maxY) / 2.0
+            state.copy(
+                viewport = ViewportBounds(cx - newW / 2.0, cx + newW / 2.0, cy - newH / 2.0, cy + newH / 2.0)
+            )
+        }
+        recomputeCurves()
+    }
+
+    fun zoomOut() {
+        _uiState.update { state ->
+            val vp = state.viewport
+            val factor = 1.25
+            val newW = vp.width * factor
+            val newH = vp.height * factor
+            val cx = (vp.minX + vp.maxX) / 2.0
+            val cy = (vp.minY + vp.maxY) / 2.0
+            state.copy(
+                viewport = ViewportBounds(cx - newW / 2.0, cx + newW / 2.0, cy - newH / 2.0, cy + newH / 2.0)
+            )
         }
         recomputeCurves()
     }
@@ -183,10 +248,10 @@ class GraphingCalculatorViewModel(
 
         // Check if cursor is near any special point (magnetic snap)
         val allSpecialPoints = _uiState.value.sampledCurves.flatMap { it.specialPoints } + _uiState.value.intersections
-        val snapThresholdMath = viewport.width * 0.03 // within 3% of viewport width
+        val snapThresholdMath = viewport.width * 0.04 // within 4% of viewport width
 
         val snappedSpecial = allSpecialPoints.find {
-            abs(it.point.x - mathPoint.x) < snapThresholdMath && abs(it.point.y - mathPoint.y) < (viewport.height * 0.05)
+            abs(it.point.x - mathPoint.x) < snapThresholdMath && abs(it.point.y - mathPoint.y) < (viewport.height * 0.06)
         }
 
         if (snappedSpecial != null) {
@@ -211,17 +276,27 @@ class GraphingCalculatorViewModel(
     private fun recomputeCurves() {
         val currentState = _uiState.value
         val viewport = currentState.viewport
-        val newCurves = mutableListOf<SampledCurve>()
+        val newSampledCurves = mutableListOf<SampledCurve>()
+        val newRenderedCurves = mutableListOf<RenderedCurve>()
         val compiledList = mutableListOf<CompiledFunction>()
+        val updatedFunctions = currentState.functions.toMutableList()
 
         currentState.functions.forEachIndexed { index, fnItem ->
-            if (fnItem.isVisible && fnItem.expression.isNotBlank()) {
+            if (fnItem.expression.isBlank()) {
+                updatedFunctions[index] = fnItem.copy(errorMessage = null)
+            } else {
                 val compileResult = graphingEngine.compile(fnItem.expression)
                 if (compileResult.isSuccess) {
                     val compiled = compileResult.getOrThrow()
-                    compiledList.add(compiled)
-                    val curve = graphingEngine.sample(compiled, viewport, screenPixelWidth = 500)
-                    newCurves.add(curve)
+                    updatedFunctions[index] = fnItem.copy(errorMessage = null)
+                    if (fnItem.isVisible) {
+                        compiledList.add(compiled)
+                        val curve = graphingEngine.sample(compiled, viewport, screenPixelWidth = 600)
+                        newSampledCurves.add(curve)
+                        newRenderedCurves.add(RenderedCurve(curve, fnItem.color, fnItem.id))
+                    }
+                } else {
+                    updatedFunctions[index] = fnItem.copy(errorMessage = "Biểu thức không hợp lệ")
                 }
             }
         }
@@ -238,6 +313,13 @@ class GraphingCalculatorViewModel(
             }
         }
 
-        _uiState.update { it.copy(sampledCurves = newCurves, intersections = intersections) }
+        _uiState.update {
+            it.copy(
+                functions = updatedFunctions,
+                sampledCurves = newSampledCurves,
+                renderedCurves = newRenderedCurves,
+                intersections = intersections
+            )
+        }
     }
 }

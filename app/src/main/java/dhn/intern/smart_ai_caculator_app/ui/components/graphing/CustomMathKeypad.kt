@@ -6,10 +6,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -25,121 +30,95 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun CustomMathKeypad(
     onKeyPress: (String) -> Unit,
+    onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val row1 = listOf("+f(x)", "x", "x²", "^", "√", "(", ")")
-    val row2 = listOf("sin", "cos", "tan", "ln", "log", "π", "e")
-    val row3 = listOf("7", "8", "9", "/", "AC")
-    val row4 = listOf("4", "5", "6", "*", "⌫")
-    val row5 = listOf("1", "2", "3", "-", "+")
-    val row6 = listOf("0", ".", "Hide")
+    // 5-Column Keypad Layout
+    val rows = listOf(
+        listOf("x", "x²", "^", "(", ")"),
+        listOf("sin", "cos", "tan", "√", "π"),
+        listOf("7", "8", "9", "÷", "AC"),
+        listOf("4", "5", "6", "×", "⌫"),
+        listOf("1", "2", "3", "−", "+"),
+        listOf("0", ".", "e", "ln", "log")
+    )
 
     Surface(
         modifier = modifier.fillMaxWidth(),
-        color = MaterialTheme.colorScheme.surfaceContainerLow,
+        color = MaterialTheme.colorScheme.surfaceContainer,
         tonalElevation = 6.dp,
-        shadowElevation = 8.dp
+        shadowElevation = 8.dp,
+        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 6.dp, vertical = 6.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+                .padding(start = 6.dp, end = 6.dp, top = 4.dp, bottom = 8.dp)
         ) {
-            // Function & variable row 1
+            // Keypad Mini Header (Dismiss Bar)
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onDismiss() }
+                    .padding(vertical = 4.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                row1.forEach { key ->
-                    KeypadButton(
-                        text = key,
-                        modifier = Modifier.weight(if (key == "+f(x)") 1.2f else 1.0f),
-                        backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
-                        textColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                        onClick = { onKeyPress(key) }
-                    )
-                }
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowDown,
+                    contentDescription = "Hide keypad",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(18.dp)
+                )
+                Text(
+                    text = "Ẩn bàn phím",
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.Medium
+                )
             }
 
-            // Function row 2
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                row2.forEach { key ->
-                    KeypadButton(
-                        text = key,
-                        modifier = Modifier.weight(1.0f),
-                        backgroundColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.8f),
-                        textColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                        onClick = { onKeyPress(key) }
-                    )
-                }
-            }
+            Spacer(modifier = Modifier.height(2.dp))
 
-            // Numeric & Operator rows 3 - 6
-            val numRows = listOf(row3, row4, row5)
-            numRows.forEach { rowKeys ->
+            // 6 Rows of 5 Keys
+            rows.forEach { rowKeys ->
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 2.dp),
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     rowKeys.forEach { key ->
-                        val isOp = key in listOf("/", "*", "-", "+")
+                        val isOp = key in listOf("÷", "×", "−", "+")
                         val isAc = key == "AC"
                         val isDel = key == "⌫"
+                        val isDigit = key in listOf("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ".")
 
                         val bgColor = when {
                             isAc -> MaterialTheme.colorScheme.errorContainer
                             isDel -> MaterialTheme.colorScheme.tertiaryContainer
                             isOp -> MaterialTheme.colorScheme.primaryContainer
-                            else -> MaterialTheme.colorScheme.surfaceContainerHigh
+                            isDigit -> MaterialTheme.colorScheme.surfaceContainerHighest
+                            else -> MaterialTheme.colorScheme.secondaryContainer
                         }
+
                         val textColor = when {
                             isAc -> MaterialTheme.colorScheme.onErrorContainer
                             isDel -> MaterialTheme.colorScheme.onTertiaryContainer
                             isOp -> MaterialTheme.colorScheme.onPrimaryContainer
-                            else -> MaterialTheme.colorScheme.onSurface
+                            isDigit -> MaterialTheme.colorScheme.onSurface
+                            else -> MaterialTheme.colorScheme.onSecondaryContainer
                         }
 
                         KeypadButton(
                             text = key,
-                            modifier = Modifier.weight(1.0f),
+                            modifier = Modifier.weight(1f),
                             backgroundColor = bgColor,
                             textColor = textColor,
                             onClick = { onKeyPress(key) }
                         )
                     }
                 }
-            }
-
-            // Bottom row (0, ., Hide)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                KeypadButton(
-                    text = "0",
-                    modifier = Modifier.weight(2.0f),
-                    backgroundColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                    textColor = MaterialTheme.colorScheme.onSurface,
-                    onClick = { onKeyPress("0") }
-                )
-                KeypadButton(
-                    text = ".",
-                    modifier = Modifier.weight(1.0f),
-                    backgroundColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                    textColor = MaterialTheme.colorScheme.onSurface,
-                    onClick = { onKeyPress(".") }
-                )
-                KeypadButton(
-                    text = "Hide",
-                    modifier = Modifier.weight(2.0f),
-                    backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
-                    textColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    onClick = { onKeyPress("Hide") }
-                )
             }
         }
     }
@@ -155,8 +134,8 @@ private fun KeypadButton(
 ) {
     Box(
         modifier = modifier
-            .height(42.dp)
-            .clip(RoundedCornerShape(8.dp))
+            .height(44.dp)
+            .clip(RoundedCornerShape(10.dp))
             .background(backgroundColor)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
@@ -164,8 +143,12 @@ private fun KeypadButton(
         Text(
             text = text,
             color = textColor,
-            fontSize = if (text.length > 3) 12.sp else 16.sp,
-            fontWeight = FontWeight.SemiBold
+            fontSize = when {
+                text.length >= 3 -> 13.sp
+                text.length == 2 -> 15.sp
+                else -> 17.sp
+            },
+            fontWeight = if (text in listOf("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "x")) FontWeight.Bold else FontWeight.SemiBold
         )
     }
 }
