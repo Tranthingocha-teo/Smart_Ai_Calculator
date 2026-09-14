@@ -232,5 +232,17 @@
     <string name="export_card_brand">Smart AI Calculator</string>
     <string name="export_card_footer">Calculated by Smart AI Calculator</string>
     <string name="export_copied_clipboard">Copied calculation to clipboard</string>
+
+    <!-- History UI Modernization -->
+    <string name="history_source_basic">Basic</string>
+    <string name="history_source_graphing">Graphing</string>
+    <string name="history_source_ai">AI Chat</string>
+    <string name="export_format_pdf_desc">Formatted report for viewing &amp; printing</string>
+    <string name="export_format_csv_desc">Raw data for Excel &amp; Sheets</string>
+    <string name="export_single_image_desc">High-res Dark Theme card</string>
+    <string name="export_single_pdf_desc">Official PDF document</string>
+    <string name="export_single_copy_desc">Instant copy to clipboard</string>
+    <string name="export_selected_calculation">Selected calculation</string>
+    <string name="history_items_count">%1$d calculations</string>
 </resources>
 
