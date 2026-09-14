@@ -12,5 +12,8 @@ val appModule = listOf(
 
     databaseModule,
 
-    bmiModule
+    bmiModule,
+
+    exportModule
 )
+

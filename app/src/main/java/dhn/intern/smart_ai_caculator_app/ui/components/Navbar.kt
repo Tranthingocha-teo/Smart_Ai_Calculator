@@ -25,7 +25,8 @@ import dhn.intern.smart_ai_caculator_app.R
 fun NavBar(
     navController: NavHostController,
     title: Int,
-    contentColor: Color = MaterialTheme.colorScheme.onBackground
+    contentColor: Color = MaterialTheme.colorScheme.onBackground,
+    trailingContent: @Composable (() -> Unit)? = null
 ){
     Row(
         modifier = Modifier
@@ -42,17 +43,19 @@ fun NavBar(
                 },
             contentDescription = null,
             tint = contentColor
-
         )
         Spacer(modifier = Modifier.width(10.dp))
         Text(
             text = stringResource(title),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
-            color = contentColor
+            color = contentColor,
+            modifier = Modifier.weight(1f)
         )
+        trailingContent?.invoke()
     }
 }
+
 
 @Composable
 fun NavBar_basic(
