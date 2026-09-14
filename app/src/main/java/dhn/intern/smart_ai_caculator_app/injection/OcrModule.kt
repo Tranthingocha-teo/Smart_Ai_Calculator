@@ -1,5 +1,7 @@
 package dhn.intern.smart_ai_caculator_app.injection
 
+import dhn.intern.smart_ai_caculator_app.data.preferences.ai.AiPreferences
+import dhn.intern.smart_ai_caculator_app.domain.ai.GeminiMathService
 import dhn.intern.smart_ai_caculator_app.domain.ocr.ISymbolClassifier
 import dhn.intern.smart_ai_caculator_app.domain.ocr.ImagePreprocessor
 import dhn.intern.smart_ai_caculator_app.domain.ocr.MathOcrEngine
@@ -19,5 +21,7 @@ val ocrModule = module {
     single { MathOcrEngine(get(), get(), get()) }
     single { MlKitMathOcrEngine(get()) }
     single { StepByStepMathSolver(get()) }
-    viewModel { AiChatViewModel(get()) }
+    single { AiPreferences(androidContext()) }
+    single { GeminiMathService(customKeyProvider = { get<AiPreferences>().cachedKey }) }
+    viewModel { AiChatViewModel(get(), get(), get()) }
 }

@@ -103,4 +103,31 @@ class AiChatViewModelTest {
         assertTrue(aiMsg.solution?.finalAnswer?.contains("3") == true)
         assertTrue(aiMsg.solution?.finalAnswer?.contains("2") == true)
     }
+
+    @Test
+    fun `sendMessage with greeting returns conversational welcome and offline guidance`() = runTest {
+        viewModel.sendMessage("Xin chào bạn")
+        advanceUntilIdle()
+
+        val messages = viewModel.messages.value
+        assertEquals(3, messages.size)
+
+        val aiMsg = messages[2]
+        assertFalse(aiMsg.isFromUser)
+        assertTrue(aiMsg.text.contains("Xin chào"))
+        assertTrue(aiMsg.text.contains("Gia sư Toán học AI"))
+    }
+
+    @Test
+    fun `sendMessage with about or help returns intro guidance`() = runTest {
+        viewModel.sendMessage("Bạn là ai?")
+        advanceUntilIdle()
+
+        val messages = viewModel.messages.value
+        assertEquals(3, messages.size)
+
+        val aiMsg = messages[2]
+        assertFalse(aiMsg.isFromUser)
+        assertTrue(aiMsg.text.contains("Smart AI Calculator"))
+    }
 }
