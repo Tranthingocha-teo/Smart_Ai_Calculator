@@ -42,4 +42,19 @@
     <string name="export_single_copy_desc">Dán nhanh vào tin nhắn hoặc ghi chú</string>
     <string name="export_selected_calculation">Phép tính được chọn</string>
     <string name="history_items_count">%1$d phép tính</string>
+
+    <!-- Math OCR & Smart Scanner -->
+    <string name="math_scan_title">Quét công thức toán</string>
+    <string name="math_scan_hint">Căn chỉnh công thức vào khung quét</string>
+    <string name="math_scan_processing">Đang nhận diện công thức viết tay...</string>
+    <string name="math_scan_result_title">Công thức nhận diện</string>
+    <string name="math_scan_eval_result">Kết quả tính toán</string>
+    <string name="math_scan_accuracy">Độ tin cậy: %1$d%%</string>
+    <string name="math_scan_insert_calc">Chuyển vào máy tính</string>
+    <string name="math_scan_draw_graph">Vẽ đồ thị hàm số</string>
+    <string name="math_scan_ask_ai">Hỏi gia sư AI</string>
+    <string name="math_scan_copy">Sao chép công thức</string>
+    <string name="math_scan_again">Quét lại</string>
+    <string name="math_scan_no_formula">Không nhận diện được công thức. Vui lòng thử lại với đủ ánh sáng.</string>
+    <string name="math_scan_manual_input">Nhập thủ công</string>
 </resources>

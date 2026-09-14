@@ -33,26 +33,34 @@ import dhn.intern.smart_ai_caculator_app.R
 import dhn.intern.smart_ai_caculator_app.enum.AiScanKey
 
 @Composable
-fun ButtonScanChatAi() {
+fun ButtonScanChatAi(
+    onGalleryClick: () -> Unit = {},
+    onCaptureClick: () -> Unit = {},
+    onFlashClick: () -> Unit = {},
+    isFlashOn: Boolean = false
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.Transparent)
             .padding(horizontal = 24.dp),
-    verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically
     ) {
         IconButtonScan(
-            drawable = R.drawable.library
+            drawable = R.drawable.library,
+            onClick = onGalleryClick
         )
         Spacer(modifier = Modifier.weight(1f))
         ImageButtonScan(
-            drawable = R.drawable.ic_camera
+            drawable = R.drawable.ic_camera,
+            onClick = onCaptureClick
         )
         Spacer(modifier = Modifier.weight(1f))
         IconButtonScan(
-            drawable = R.drawable.flash
+            drawable = R.drawable.flash,
+            onClick = onFlashClick,
+            tint = if (isFlashOn) Color(0xFFFFD600) else Color.Unspecified
         )
-
     }
 }
 @Composable
@@ -101,10 +109,12 @@ fun BottomScanAndChat(
 }
 @Composable
 fun IconButtonScan(
-    drawable: Int
+    drawable: Int,
+    onClick: () -> Unit = {},
+    tint: Color = Color.Unspecified
 ){
     IconButton(
-        onClick = {},
+        onClick = onClick,
         modifier = Modifier
             .size(80.dp),
     ) {
@@ -112,17 +122,18 @@ fun IconButtonScan(
             painter = painterResource(drawable),
             contentDescription = null,
             modifier = Modifier.size(65.dp),
-            tint = Color.Unspecified,
-            )
+            tint = tint,
+        )
     }
 }
 
 @Composable
 fun ImageButtonScan(
-    drawable: Int
+    drawable: Int,
+    onClick: () -> Unit = {}
 ){
     IconButton(
-        onClick = {},
+        onClick = onClick,
         modifier = Modifier
             .size(90.dp),
     ) {

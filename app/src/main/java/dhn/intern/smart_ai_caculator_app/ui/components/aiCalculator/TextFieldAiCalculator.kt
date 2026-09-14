@@ -37,9 +37,11 @@ import dhn.intern.smart_ai_caculator_app.R
 @Composable
 fun TextFiledAiCalculator(
     generating: Boolean,
-    modifier: Modifier
+    modifier: Modifier,
+    initialText: String = "",
+    onSend: (String) -> Unit = {}
 ) {
-    var text by remember { mutableStateOf("") }
+    var text by remember(initialText) { mutableStateOf(initialText) }
 
     Box(
         modifier = modifier

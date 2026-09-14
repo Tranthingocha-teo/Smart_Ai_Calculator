@@ -23,6 +23,7 @@ import dhn.intern.smart_ai_caculator_app.ui.components.NavBar_basic
 @Composable
 fun AiChatScreen(
     navController: NavHostController,
+    initialPrompt: String = "",
     modifier: Modifier = Modifier,
 ) {
     val listState = rememberLazyListState()
@@ -48,6 +49,7 @@ fun AiChatScreen(
         bottomBar = {
             TextFiledAiCalculator(
                 generating = false,
+                initialText = initialPrompt,
                 modifier = Modifier.imePadding()
             )
         },
