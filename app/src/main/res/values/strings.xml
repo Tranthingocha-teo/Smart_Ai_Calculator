@@ -200,4 +200,37 @@
     <string name="gpa_calculator_delete">Delete</string>
     <string name="gpa_calculator_clear_all">Clear All Subjects?</string>
     <string name="gpa_calculator_clear_all_confirm">Are you sure you want to delete all subjects?</string>
+
+    <!-- Export & Share -->
+    <string name="export_history_title">Export History</string>
+    <string name="export_format">File Format</string>
+    <string name="export_format_pdf">PDF Document (.pdf)</string>
+    <string name="export_format_csv">Spreadsheet (.csv)</string>
+    <string name="export_format_image">Image Card (.png)</string>
+    <string name="export_format_text">Copy Expression &amp; Result</string>
+    <string name="export_scope">Scope</string>
+    <string name="export_scope_current">Current category only</string>
+    <string name="export_scope_all">All categories</string>
+    <string name="export_action_share">Share</string>
+    <string name="export_action_save">Save to Downloads</string>
+    <string name="export_record_count">%1$d calculation(s) selected</string>
+    <string name="export_empty_history">History is empty</string>
+    <string name="export_empty_history_hint">History is empty. Perform calculations before exporting.</string>
+    <string name="export_success_saved">Saved file to Downloads</string>
+    <string name="export_action_open">Open</string>
+    <string name="export_error_generic">Export failed: %1$s</string>
+    <string name="history_bottom_share_export">Share / Export</string>
+    <string name="export_single_title">Share Calculation</string>
+    <string name="export_single_subtitle">Choose format to share</string>
+    <string name="export_pdf_title">Calculation History Report</string>
+    <string name="export_col_index">No.</string>
+    <string name="export_col_time">Date &amp; Time</string>
+    <string name="export_col_source">Type</string>
+    <string name="export_col_expression">Expression</string>
+    <string name="export_col_result">Result</string>
+    <string name="export_pdf_footer_page">Page %1$d of %2$d</string>
+    <string name="export_card_brand">Smart AI Calculator</string>
+    <string name="export_card_footer">Calculated by Smart AI Calculator</string>
+    <string name="export_copied_clipboard">Copied calculation to clipboard</string>
 </resources>
+

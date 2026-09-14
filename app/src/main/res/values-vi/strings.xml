@@ -1,0 +1,33 @@
+<resources>
+    <!-- Export & Share -->
+    <string name="export_history_title">Xuất Lịch Sử</string>
+    <string name="export_format">Định Dạng File</string>
+    <string name="export_format_pdf">Tài liệu PDF (.pdf)</string>
+    <string name="export_format_csv">Bảng tính Excel (.csv)</string>
+    <string name="export_format_image">Thẻ ảnh chia sẻ (.png)</string>
+    <string name="export_format_text">Sao chép biểu thức &amp; kết quả</string>
+    <string name="export_scope">Phạm Vi Xuất</string>
+    <string name="export_scope_current">Chỉ danh mục hiện tại</string>
+    <string name="export_scope_all">Toàn bộ lịch sử (Tất cả nguồn)</string>
+    <string name="export_action_share">Chia Sẻ</string>
+    <string name="export_action_save">Lưu vào Tải về</string>
+    <string name="export_record_count">Đã chọn %1$d phép tính</string>
+    <string name="export_empty_history">Lịch sử đang trống</string>
+    <string name="export_empty_history_hint">Lịch sử đang trống. Hãy thực hiện tính toán trước khi xuất.</string>
+    <string name="export_success_saved">Đã lưu file thành công vào thư mục Tải về</string>
+    <string name="export_action_open">Mở</string>
+    <string name="export_error_generic">Xuất file thất bại: %1$s</string>
+    <string name="history_bottom_share_export">Chia sẻ / Xuất phép tính</string>
+    <string name="export_single_title">Chia Sẻ Phép Tính</string>
+    <string name="export_single_subtitle">Chọn cách thức chia sẻ</string>
+    <string name="export_pdf_title">Báo Cáo Lịch Sử Tính Toán</string>
+    <string name="export_col_index">STT</string>
+    <string name="export_col_time">Thời Gian</string>
+    <string name="export_col_source">Nguồn</string>
+    <string name="export_col_expression">Biểu Thức</string>
+    <string name="export_col_result">Kết Quả</string>
+    <string name="export_pdf_footer_page">Trang %1$d / %2$d</string>
+    <string name="export_card_brand">Smart AI Calculator</string>
+    <string name="export_card_footer">Tính toán bởi Smart AI Calculator</string>
+    <string name="export_copied_clipboard">Đã sao chép phép tính vào bộ nhớ tạm</string>
+</resources>
