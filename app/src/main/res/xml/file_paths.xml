@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
     <cache-path name="graph_images" path="graph_images/" />
+    <cache-path name="export_cache" path="exports/" />
+    <cache-path name="shared_cache" path="." />
 </paths>
+
