@@ -52,6 +52,7 @@ fun ai_caculator_screen(
                 AiChatScreen(
                     navController = navController,
                     initialPrompt = chatInitialPrompt,
+                    onPromptConsumed = { chatInitialPrompt = "" },
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(bottom = 95.dp)

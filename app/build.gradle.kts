@@ -95,4 +95,7 @@ dependencies {
     // TensorFlow Lite
     implementation("org.tensorflow:tensorflow-lite:2.14.0")
     implementation("org.tensorflow:tensorflow-lite-support:0.4.4")
+
+    // Google ML Kit On-Device Text Recognition
+    implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.0")
 }

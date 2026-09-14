@@ -65,6 +65,7 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import dhn.intern.smart_ai_caculator_app.R
 import dhn.intern.smart_ai_caculator_app.domain.ocr.MathOcrEngine
+import dhn.intern.smart_ai_caculator_app.domain.ocr.MlKitMathOcrEngine
 import dhn.intern.smart_ai_caculator_app.domain.ocr.model.MathOcrResult
 import dhn.intern.smart_ai_caculator_app.navigation.NavScreen
 import dhn.intern.smart_ai_caculator_app.ui.components.NavBar
@@ -135,6 +136,7 @@ fun SuccessPermission(
     val haptic = LocalHapticFeedback.current
     val coroutineScope = rememberCoroutineScope()
     val ocrEngine: MathOcrEngine = koinInject()
+    val mlKitEngine: MlKitMathOcrEngine = koinInject()
     val executor = remember { ContextCompat.getMainExecutor(context) }
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -152,6 +154,20 @@ fun SuccessPermission(
                     cam.cameraControl.enableTorch(false)
                 }
             }
+        }
+    }
+
+    suspend fun performOcr(bitmap: Bitmap): MathOcrResult {
+        val mlKitResult = try {
+            mlKitEngine.recognize(bitmap)
+        } catch (e: Exception) {
+            null
+        }
+
+        return if (mlKitResult != null && mlKitResult.formattedExpression.isNotBlank()) {
+            mlKitResult
+        } else {
+            ocrEngine.recognize(bitmap)
         }
     }
 
@@ -185,7 +201,7 @@ fun SuccessPermission(
                     val bitmap = BitmapFactory.decodeStream(stream)
                     stream?.close()
                     if (bitmap != null) {
-                        val result = ocrEngine.recognize(bitmap)
+                        val result = performOcr(bitmap)
                         withContext(Dispatchers.Main) {
                             isScanning = false
                             if (result.symbols.isEmpty() || result.formattedExpression.isBlank()) {
@@ -256,7 +272,7 @@ fun SuccessPermission(
                                         try {
                                             val fullBitmap = imageProxyToBitmap(imageProxy)
                                             val croppedBitmap = cropToReticle(fullBitmap)
-                                            val result = ocrEngine.recognize(croppedBitmap)
+                                            val result = performOcr(croppedBitmap)
                                             withContext(Dispatchers.Main) {
                                                 isScanning = false
                                                 if (result.symbols.isEmpty() || result.formattedExpression.isBlank()) {

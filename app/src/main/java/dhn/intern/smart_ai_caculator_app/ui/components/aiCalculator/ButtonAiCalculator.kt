@@ -161,18 +161,13 @@ fun ButtonScanChatAiChild(
     ) {
         Icon(
             painter = painterResource(icon),
-            modifier = Modifier
-                .size(28.dp)
-                .clickable {
-                    onClick
-                },
+            modifier = Modifier.size(28.dp),
             contentDescription = null,
             tint = if(state){
                 MaterialTheme.colorScheme.outline
             }else{
                 MaterialTheme.colorScheme.onSurface
             }
-
         )
         Spacer(modifier = Modifier.height(5.dp))
         Text(
@@ -191,10 +186,13 @@ fun ButtonScanChatAiChild(
 @Composable
 fun ButtonSendChatAiChild(
     image: Int,
-    icon: Int
+    icon: Int,
+    onClick: () -> Unit = {}
 ){
     Box(
-        modifier = Modifier.size(50.dp),
+        modifier = Modifier
+            .size(50.dp)
+            .clickable(onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
         Image(

@@ -34,6 +34,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dhn.intern.smart_ai_caculator_app.R
 
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
+
 @Composable
 fun TextFiledAiCalculator(
     generating: Boolean,
@@ -43,12 +47,19 @@ fun TextFiledAiCalculator(
 ) {
     var text by remember(initialText) { mutableStateOf(initialText) }
 
+    val handleSend = {
+        if (text.isNotBlank() && !generating) {
+            val toSend = text
+            text = ""
+            onSend(toSend)
+        }
+    }
+
     Box(
         modifier = modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.primary)
-            .padding(start =16.dp, end = 16.dp, bottom = 16.dp)
-
+            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
     ) {
         Row(
             modifier = Modifier
@@ -81,6 +92,8 @@ fun TextFiledAiCalculator(
                     value = text,
                     onValueChange = { text = it },
                     singleLine = true,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
+                    keyboardActions = KeyboardActions(onSend = { handleSend() }),
                     textStyle = TextStyle(
                         color = MaterialTheme.colorScheme.onBackground,
                         fontSize = 16.sp
@@ -101,7 +114,8 @@ fun TextFiledAiCalculator(
 
             ButtonSendChatAiChild(
                 image = R.drawable.ic_ellipse,
-                icon = if (generating) R.drawable.airun else R.drawable.send
+                icon = if (generating) R.drawable.airun else R.drawable.send,
+                onClick = handleSend
             )
         }
     }

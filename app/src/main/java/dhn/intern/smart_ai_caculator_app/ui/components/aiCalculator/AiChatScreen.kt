@@ -20,14 +20,39 @@ import androidx.navigation.NavHostController
 import dhn.intern.smart_ai_caculator_app.R
 import dhn.intern.smart_ai_caculator_app.ui.components.NavBar_basic
 
+import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
+import dhn.intern.smart_ai_caculator_app.ui.viewmodel.AiChatViewModel
+import org.koin.androidx.compose.koinViewModel
+
 @Composable
 fun AiChatScreen(
     navController: NavHostController,
     initialPrompt: String = "",
+    onPromptConsumed: () -> Unit = {},
     modifier: Modifier = Modifier,
+    viewModel: AiChatViewModel = koinViewModel(),
 ) {
     val listState = rememberLazyListState()
+    val messages by viewModel.messages.collectAsState()
+    val isGenerating by viewModel.isGenerating.collectAsState()
+    val clipboardManager = LocalClipboardManager.current
 
+    LaunchedEffect(initialPrompt) {
+        if (initialPrompt.isNotBlank()) {
+            viewModel.sendMessage(initialPrompt)
+            onPromptConsumed()
+        }
+    }
+
+    LaunchedEffect(messages.size) {
+        if (messages.isNotEmpty()) {
+            listState.animateScrollToItem(messages.size - 1)
+        }
+    }
 
     Scaffold(
         modifier = modifier,
@@ -48,8 +73,9 @@ fun AiChatScreen(
         },
         bottomBar = {
             TextFiledAiCalculator(
-                generating = false,
-                initialText = initialPrompt,
+                generating = isGenerating,
+                initialText = "",
+                onSend = { viewModel.sendMessage(it) },
                 modifier = Modifier.imePadding()
             )
         },
@@ -62,20 +88,24 @@ fun AiChatScreen(
                 .background(MaterialTheme.colorScheme.primary),
             contentPadding = PaddingValues(bottom = 100.dp)
         ) {
-            item {
-                UserMessageBubble(
-                    message = "What is the result of 25 multiplied by 4?",
-                    image = null,
-                    time = "10:31 AM",
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-            item {
-                AiMessageBubble(
-                    message = "Hello! How can I assist you with your calculations today?",
-                    time = "10:30 AM",
-                    modifier = Modifier.padding(16.dp)
-                )
+            items(messages, key = { it.id }) { msg ->
+                if (msg.isFromUser) {
+                    UserMessageBubble(
+                        message = msg.text,
+                        image = null,
+                        time = msg.timestamp,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                } else {
+                    AiMessageBubble(
+                        message = msg.text,
+                        time = msg.timestamp,
+                        modifier = Modifier.padding(16.dp),
+                        onAction = {
+                            clipboardManager.setText(AnnotatedString(msg.text))
+                        }
+                    )
+                }
             }
         }
     }
