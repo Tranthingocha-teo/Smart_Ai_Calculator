@@ -27,13 +27,20 @@ object MenuData {
                 navhost = "copy_result_screen"
             ),
             MenuUI(
-                code = 1,
+                code = 4,
+                name = R.string.history_bottom_share_export,
+                icon = R.drawable.share,
+                navhost = "share_export_screen"
+            ),
+            MenuUI(
+                code = 5,
                 name = R.string.history_bottom_delete,
                 icon = R.drawable.delete,
                 navhost = "delete_history_screen"
             ),
         )
     }
+
     fun getMenuData(selectedCode: String): List<MenuUI> {
         return listOf(
             MenuUI(

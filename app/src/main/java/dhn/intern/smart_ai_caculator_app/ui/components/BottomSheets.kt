@@ -57,6 +57,7 @@ fun HalfScreenBottomSheet(
     show: Boolean,
     history: CalculatorHistoryEntity?,
     onDismiss: () -> Unit,
+    onMenuItemClick: ((MenuUI, CalculatorHistoryEntity) -> Unit)? = null
 ) {
     val menuList = MenuData.getSettingHistoryData()
     val sheetState = rememberModalBottomSheetState(
@@ -109,6 +110,7 @@ fun HalfScreenBottomSheet(
                 ) {
                     itemsIndexed(menuList) { index, item ->
                         BottomItemRow(item) {
+                            onMenuItemClick?.invoke(item, history)
                         }
                         if(index < menuList.lastIndex)
                         HorizontalDivider(
@@ -121,6 +123,7 @@ fun HalfScreenBottomSheet(
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
