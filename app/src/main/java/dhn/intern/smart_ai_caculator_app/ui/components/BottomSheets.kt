@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -68,57 +70,75 @@ fun HalfScreenBottomSheet(
             onDismissRequest = onDismiss,
             sheetState = sheetState,
             containerColor = MaterialTheme.colorScheme.background,
+            shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(horizontal = 20.dp, vertical = 12.dp)
                     .navigationBarsPadding(),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Row(
-                    modifier =  Modifier
-                        .background(MaterialTheme.colorScheme.background),
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = history.timestamp.toDateTimeString(),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
+                        style = MaterialTheme.typography.titleMedium,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.weight(1f)
                     )
-                    Spacer(modifier = Modifier.weight(1f))
 
-                    Icon(
-                        painter = painterResource(id = R.drawable.close),
+                    Box(
                         modifier = Modifier
-                            .size(15.dp)
-                            .clickable{
-                                onDismiss()
-                            },
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onBackground
-                    )
+                            .size(32.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
+                            .clickable { onDismiss() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.close),
+                            modifier = Modifier.size(14.dp),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onBackground
+                        )
+                    }
                 }
 
                 CaculatorHistory(
                     history = history,
                     onClick = {}
                 )
-                LazyColumn(
-                    modifier = Modifier.wrapContentHeight(),
-                    userScrollEnabled = false
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .border(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f),
+                            shape = RoundedCornerShape(16.dp)
+                        )
+                        .background(MaterialTheme.colorScheme.surface)
                 ) {
-                    itemsIndexed(menuList) { index, item ->
+                    menuList.forEachIndexed { index, item ->
                         BottomItemRow(item) {
                             onMenuItemClick?.invoke(item, history)
                         }
-                        if(index < menuList.lastIndex)
-                        HorizontalDivider(
-                            modifier = Modifier.padding(start = 10.dp, end = 10.dp),
-                            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
-                        )
+                        if (index < menuList.lastIndex) {
+                            HorizontalDivider(
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.25f)
+                            )
+                        }
                     }
                 }
+
+                Spacer(modifier = Modifier.height(4.dp))
             }
         }
     }
@@ -236,34 +256,51 @@ fun BottomItemRow(
     item: MenuUI,
     onClick: () -> Unit,
 ) {
-    Card(
+    val (iconBgColor, iconTintColor, textColor) = when (item.code) {
+        1 -> Triple(Color(0xFF3B82F6).copy(alpha = 0.12f), Color(0xFF3B82F6), MaterialTheme.colorScheme.onBackground)
+        2 -> Triple(Color(0xFFF59E0B).copy(alpha = 0.12f), Color(0xFFF59E0B), MaterialTheme.colorScheme.onBackground)
+        3 -> Triple(Color(0xFF10B981).copy(alpha = 0.12f), Color(0xFF10B981), MaterialTheme.colorScheme.onBackground)
+        4 -> Triple(Color(0xFF8B5CF6).copy(alpha = 0.12f), Color(0xFF8B5CF6), MaterialTheme.colorScheme.onBackground)
+        5 -> Triple(Color(0xFFEF4444).copy(alpha = 0.12f), Color(0xFFEF4444), Color(0xFFEF4444))
+        else -> Triple(Color(0xFF0B57D0).copy(alpha = 0.12f), Color(0xFF0B57D0), MaterialTheme.colorScheme.onBackground)
+    }
+
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 4.dp),
-        shape = RoundedCornerShape(10.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.background,
-            contentColor = MaterialTheme.colorScheme.onSurface
-        ),
-        onClick = onClick
+            .clickable { onClick() }
+            .padding(horizontal = 16.dp, vertical = 13.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
+        Box(
             modifier = Modifier
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+                .size(38.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(iconBgColor),
+            contentAlignment = Alignment.Center
         ) {
             Icon(
                 painter = painterResource(id = item.icon.toInt()),
                 contentDescription = null,
-                modifier = Modifier.size(30.dp),
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            Text(
-                text = stringResource(id = item.name),
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Medium
+                modifier = Modifier.size(20.dp),
+                tint = iconTintColor
             )
         }
+        Spacer(modifier = Modifier.width(14.dp))
+        Text(
+            text = stringResource(id = item.name),
+            style = MaterialTheme.typography.bodyLarge,
+            fontSize = 15.sp,
+            fontWeight = if (item.code == 5) FontWeight.SemiBold else FontWeight.Medium,
+            color = textColor,
+            modifier = Modifier.weight(1f)
+        )
+        Icon(
+            painter = painterResource(R.drawable.back),
+            contentDescription = null,
+            modifier = Modifier.size(12.dp),
+            tint = if (item.code == 5) Color(0xFFEF4444).copy(alpha = 0.5f) else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+        )
     }
 }
 

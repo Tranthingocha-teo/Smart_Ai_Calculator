@@ -1,6 +1,8 @@
 package dhn.intern.smart_ai_caculator_app.ui.screen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -18,6 +21,7 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -25,12 +29,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import dhn.intern.smart_ai_caculator_app.R
@@ -121,19 +129,63 @@ fun HistoryScreen(
             when (source) {
                 HistorySource.CALCULATOR,
                 HistorySource.GRAPHING_CALCULATOR -> {
-                    LazyColumn {
-                        items(
-                            items = filtered,
-                            key = { it.id }
-                        ) { historyItem ->
-                            CaculatorHistory(
-                                history = historyItem,
-                                onClick = {
-                                    selectedHistory = historyItem
-                                    showBottomSheet = true
-                                },
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
+                    if (filtered.isEmpty()) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(top = 80.dp),
+                            contentAlignment = Alignment.TopCenter
+                        ) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(64.dp)
+                                        .clip(CircleShape)
+                                        .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.history),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(32.dp),
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(
+                                    text = stringResource(R.string.export_empty_history),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = stringResource(R.string.export_empty_history_hint),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.padding(horizontal = 32.dp)
+                                )
+                            }
+                        }
+                    } else {
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            items(
+                                items = filtered,
+                                key = { it.id }
+                            ) { historyItem ->
+                                CaculatorHistory(
+                                    history = historyItem,
+                                    onClick = {
+                                        selectedHistory = historyItem
+                                        showBottomSheet = true
+                                    },
+                                )
+                            }
                         }
                     }
                 }

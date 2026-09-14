@@ -30,4 +30,16 @@
     <string name="export_card_brand">Smart AI Calculator</string>
     <string name="export_card_footer">Tính toán bởi Smart AI Calculator</string>
     <string name="export_copied_clipboard">Đã sao chép phép tính vào bộ nhớ tạm</string>
+
+    <!-- History UI Modernization -->
+    <string name="history_source_basic">Cơ bản</string>
+    <string name="history_source_graphing">Đồ thị</string>
+    <string name="history_source_ai">AI Chat</string>
+    <string name="export_format_pdf_desc">Báo cáo trang trọng để in ấn hoặc đọc</string>
+    <string name="export_format_csv_desc">Dữ liệu thô mở bằng Excel &amp; Sheets</string>
+    <string name="export_single_image_desc">Thẻ ảnh Dark Theme chất lượng cao</string>
+    <string name="export_single_pdf_desc">Tài liệu PDF trang trọng</string>
+    <string name="export_single_copy_desc">Dán nhanh vào tin nhắn hoặc ghi chú</string>
+    <string name="export_selected_calculation">Phép tính được chọn</string>
+    <string name="history_items_count">%1$d phép tính</string>
 </resources>
