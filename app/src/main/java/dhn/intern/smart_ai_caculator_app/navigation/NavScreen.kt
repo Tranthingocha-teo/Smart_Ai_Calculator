@@ -22,6 +22,8 @@ sealed class NavScreen {
 
     object BasicCaculatorScreen : NavScreen() {
         const val route = "basic_caculator"
+        fun createRoute(expr: String? = null): String =
+            if (expr != null) "$route?expr=${android.net.Uri.encode(expr)}" else route
     }
 
     object AiCaculatorScreen : NavScreen() {
@@ -61,6 +63,8 @@ sealed class NavScreen {
 
     object GraphingCalculatorScreen : NavScreen() {
         const val route = "graphing_calculator"
+        fun createRoute(expr: String? = null): String =
+            if (expr != null) "$route?expr=${android.net.Uri.encode(expr)}" else route
     }
 
     object ResultBMIScreen {

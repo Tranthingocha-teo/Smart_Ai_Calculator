@@ -29,6 +29,8 @@ import dhn.intern.smart_ai_caculator_app.ui.screen.GpaCalculatorScreen
 import dhn.intern.smart_ai_caculator_app.ui.screen.GraphingCalculatorScreen
 import dhn.intern.smart_ai_caculator_app.ui.screen.ai_caculator_screen
 import dhn.intern.smart_ai_caculator_app.ui.viewmodel.AppViewModel
+import dhn.intern.smart_ai_caculator_app.ui.viewmodel.CalculatorViewModel
+import dhn.intern.smart_ai_caculator_app.ui.viewmodel.GraphingCalculatorViewModel
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
@@ -81,9 +83,26 @@ fun AppNavHost(
             )
         }
 
-        composable(NavScreen.BasicCaculatorScreen.route){
+        composable(
+            route = "${NavScreen.BasicCaculatorScreen.route}?expr={expr}",
+            arguments = listOf(
+                navArgument("expr") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            )
+        ) { backStackEntry ->
+            val initialExpr = backStackEntry.arguments?.getString("expr")
+            val calculatorViewModel: CalculatorViewModel = koinViewModel()
+            LaunchedEffect(initialExpr) {
+                if (!initialExpr.isNullOrBlank()) {
+                    calculatorViewModel.setExpression(initialExpr)
+                }
+            }
             BasicCaculatorScreen(
-                navController = navController
+                navController = navController,
+                calculatorViewModel = calculatorViewModel
             )
         }
         composable(NavScreen.AiCaculatorScreen.route){
@@ -139,9 +158,26 @@ fun AppNavHost(
                 modifier = Modifier
             )
         }
-        composable(NavScreen.GraphingCalculatorScreen.route){
+        composable(
+            route = "${NavScreen.GraphingCalculatorScreen.route}?expr={expr}",
+            arguments = listOf(
+                navArgument("expr") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            )
+        ) { backStackEntry ->
+            val initialExpr = backStackEntry.arguments?.getString("expr")
+            val graphingViewModel: GraphingCalculatorViewModel = koinViewModel()
+            LaunchedEffect(initialExpr) {
+                if (!initialExpr.isNullOrBlank()) {
+                    graphingViewModel.updateFunctionExpression(0, initialExpr)
+                }
+            }
             GraphingCalculatorScreen(
-                navController = navController
+                navController = navController,
+                viewModel = graphingViewModel
             )
         }
 

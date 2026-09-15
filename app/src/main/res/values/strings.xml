@@ -83,6 +83,21 @@
     <string name="ai_calculator_rewrite">Rewrite</string>
     <string name="ai_calculator_user">User</string>
 
+    <!-- Math OCR & Smart Scanner -->
+    <string name="math_scan_title">Math Formula Scanner</string>
+    <string name="math_scan_hint">Align math equation inside the box</string>
+    <string name="math_scan_processing">Analyzing handwritten math formula...</string>
+    <string name="math_scan_result_title">Scanned Equation</string>
+    <string name="math_scan_eval_result">Evaluated Result</string>
+    <string name="math_scan_accuracy">Confidence: %1$d%%</string>
+    <string name="math_scan_insert_calc">Insert to Calculator</string>
+    <string name="math_scan_draw_graph">Draw Graph</string>
+    <string name="math_scan_ask_ai">Ask AI Tutor</string>
+    <string name="math_scan_copy">Copy Formula</string>
+    <string name="math_scan_again">Scan Again</string>
+    <string name="math_scan_no_formula">No formula recognized. Please try again with clear lighting.</string>
+    <string name="math_scan_manual_input">Type Manually</string>
+
     <!-- Unit Calculator-->
     <string name="unit_calculator_length">Length</string>
     <string name="unit_calculator_mass">Mass</string>
