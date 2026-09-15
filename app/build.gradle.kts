@@ -89,7 +89,7 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation("androidx.appcompat:appcompat:1.7.0")
     // Navigation Compose
-    implementation("androidx.navigation:navigation-compose:2.7.3")
+    implementation("androidx.navigation:navigation-compose:2.10.1")
 
     // Room core
     implementation("androidx.room:room-runtime:$room_version")
