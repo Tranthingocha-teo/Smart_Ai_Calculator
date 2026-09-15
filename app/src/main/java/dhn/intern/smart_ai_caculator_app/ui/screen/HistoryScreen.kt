@@ -65,7 +65,13 @@ fun HistoryScreen(
     exportManager: HistoryExportManager = koinInject()
 ) {
     val histories by calculatorViewModel.history.collectAsState()
-    val filtered = histories.filter { it.source == source.name }
+    val filtered = histories.filter {
+        if (source == HistorySource.CALCULATOR) {
+            it.source == HistorySource.CALCULATOR.name || it.source == HistorySource.UNIT_CONVERTER.name
+        } else {
+            it.source == source.name
+        }
+    }
 
     var selectedHistory by remember { mutableStateOf<CalculatorHistoryEntity?>(null) }
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -128,7 +134,8 @@ fun HistoryScreen(
         ) {
             when (source) {
                 HistorySource.CALCULATOR,
-                HistorySource.GRAPHING_CALCULATOR -> {
+                HistorySource.GRAPHING_CALCULATOR,
+                HistorySource.UNIT_CONVERTER -> {
                     if (filtered.isEmpty()) {
                         Box(
                             modifier = Modifier

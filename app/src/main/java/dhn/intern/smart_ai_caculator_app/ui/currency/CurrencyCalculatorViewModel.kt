@@ -3,9 +3,12 @@ package dhn.intern.smart_ai_caculator_app.ui.currency
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dhn.intern.smart_ai_caculator_app.data.constant.DefaultCurrencyRates
+import dhn.intern.smart_ai_caculator_app.data.repository.CalculatorHistoryRepository
 import dhn.intern.smart_ai_caculator_app.data.repository.CurrencyRepository
 import dhn.intern.smart_ai_caculator_app.util.calculator.SmartFormatter
 import dhn.intern.smart_ai_caculator_app.util.calculator.UnitConverterUtil
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,7 +23,6 @@ data class CurrencyUiState(
     val toCurrency: String = "EUR",
     val inputAmount: Double = 1.0,
     val convertedResult: String = "",
-    // Khởi tạo sẵn bằng STATIC_RATES để UI luôn có dữ liệu tính toán ngay lập tức
     val rates: Map<String, Double> = DefaultCurrencyRates.STATIC_RATES,
     val lastUpdatedText: String = "Dữ liệu ngoại tuyến",
     val isLoading: Boolean = false,
@@ -28,16 +30,18 @@ data class CurrencyUiState(
 )
 
 class CurrencyCalculatorViewModel(
-    private val currencyRepository: CurrencyRepository
+    private val currencyRepository: CurrencyRepository,
+    private val historyRepository: CalculatorHistoryRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CurrencyUiState())
     val uiState: StateFlow<CurrencyUiState> = _uiState.asStateFlow()
 
+    private var debounceJob: Job? = null
+    private var lastSavedExpression: String? = null
+
     init {
-        // Tính toán ngay 1 lần với STATIC_RATES ban đầu
         calculateConversion()
-        // Sau đó mới fetch API để cập nhật đè lên
         loadCurrencyRates()
     }
 
@@ -65,7 +69,6 @@ class CurrencyCalculatorViewModel(
                 }
                 calculateConversion()
             } catch (e: Exception) {
-                // In log để biết chính xác Retrofit/Room bị lỗi gì
                 android.util.Log.e("CURRENCY_API_ERROR", "Lỗi fetch: ${e.message}", e)
                 _uiState.update {
                     it.copy(
@@ -80,6 +83,14 @@ class CurrencyCalculatorViewModel(
     fun onAmountChanged(amount: Double) {
         _uiState.update { it.copy(inputAmount = amount) }
         calculateConversion()
+
+        debounceJob?.cancel()
+        if (amount <= 0.0) return
+
+        debounceJob = viewModelScope.launch {
+            delay(1500L)
+            saveHistory()
+        }
     }
 
     fun onFromCurrencyChanged(code: String) {
@@ -93,6 +104,7 @@ class CurrencyCalculatorViewModel(
     }
 
     fun swapCurrencies() {
+        debounceJob?.cancel()
         _uiState.update {
             it.copy(
                 fromCurrency = it.toCurrency,
@@ -100,6 +112,22 @@ class CurrencyCalculatorViewModel(
             )
         }
         calculateConversion()
+        viewModelScope.launch {
+            saveHistory()
+        }
+    }
+
+    private suspend fun saveHistory() {
+        val state = _uiState.value
+        val expression = "${state.inputAmount} ${state.fromCurrency}"
+
+        if (state.inputAmount > 0 && state.convertedResult.isNotBlank() && expression != lastSavedExpression) {
+            lastSavedExpression = expression
+            historyRepository.saveUnitConverter(
+                expression = expression,
+                result = state.convertedResult
+            )
+        }
     }
 
     private fun calculateConversion() {

@@ -25,5 +25,5 @@ val currencyModule = module {
     }
 
     // Dùng factory để tránh lỗi xung đột thư viện Koin ViewModel
-    factory { CurrencyCalculatorViewModel(get()) }
+    factory { CurrencyCalculatorViewModel(get(), get()) }
 }

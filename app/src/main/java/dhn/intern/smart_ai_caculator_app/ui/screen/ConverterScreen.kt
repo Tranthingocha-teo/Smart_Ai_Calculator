@@ -70,6 +70,12 @@ fun ConverterScreen(
     var fromValue by remember { mutableStateOf("1") }
     var toValue by remember { mutableStateOf("0.0") }
 
+    // Đồng bộ đơn vị ban đầu vào ViewModel
+    LaunchedEffect(fromCurrencies, toCurrencies) {
+        fromCurrencies?.title?.trim()?.uppercase()?.let { viewModel.onFromCurrencyChanged(it) }
+        toCurrencies?.title?.trim()?.uppercase()?.let { viewModel.onToCurrencyChanged(it) }
+    }
+
     // Hàm quy đổi 2 chiều áp dụng quy tắc làm tròn chuyên biệt
     fun recalculate(sourceField: ActiveField, sourceValue: String) {
         val num = sourceValue.toDoubleOrNull()
@@ -225,6 +231,9 @@ fun ConverterScreen(
                                     else -> activeField
                                 }
                                 recalculate(activeField, if (activeField == ActiveField.FROM) fromValue else toValue)
+
+                                // Kích hoạt hoán đổi và lưu tức thì vào Room DB
+                                viewModel.swapCurrencies()
                             }
 
                             else -> {
@@ -232,11 +241,16 @@ fun ConverterScreen(
                                     ActiveField.FROM -> {
                                         fromValue = handleInput(fromValue, key)
                                         recalculate(ActiveField.FROM, fromValue)
+                                        // Gửi số tiền sang ViewModel để debounce 1500ms trước khi lưu DB
+                                        val amount = fromValue.toDoubleOrNull() ?: 0.0
+                                        viewModel.onAmountChanged(amount)
                                     }
 
                                     ActiveField.TO -> {
                                         toValue = handleInput(toValue, key)
                                         recalculate(ActiveField.TO, toValue)
+                                        val amount = toValue.toDoubleOrNull() ?: 0.0
+                                        viewModel.onAmountChanged(amount)
                                     }
 
                                     else -> {}
@@ -261,10 +275,12 @@ fun ConverterScreen(
                 when (currenciesPickerFor) {
                     ActiveField.FROM -> {
                         fromCurrencies = unit
+                        unit?.title?.trim()?.uppercase()?.let { viewModel.onFromCurrencyChanged(it) }
                         recalculate(ActiveField.TO, toValue)
                     }
                     ActiveField.TO -> {
                         toCurrencies = unit
+                        unit?.title?.trim()?.uppercase()?.let { viewModel.onToCurrencyChanged(it) }
                         recalculate(ActiveField.FROM, fromValue)
                     }
                     else -> {}
