@@ -16,6 +16,8 @@ val appModule = listOf(
 
     exportModule,
 
-    currencyModule
+    currencyModule,
+
+    ocrModule
 )
 

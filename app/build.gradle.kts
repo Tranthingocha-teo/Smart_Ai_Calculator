@@ -5,6 +5,19 @@ plugins {
     id("com.google.devtools.ksp")
 }
 
+import java.util.Properties
+import java.io.FileInputStream
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(FileInputStream(localPropertiesFile))
+}
+
+val geminiApiKey: String = localProperties.getProperty("GEMINI_API_KEY")
+    ?: System.getenv("GEMINI_API_KEY")
+    ?: ""
+
 android {
     namespace = "dhn.intern.smart_ai_caculator_app"
     compileSdk {
@@ -19,6 +32,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")
     }
 
     buildTypes {
@@ -40,6 +54,9 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+    androidResources {
+        noCompress += "tflite"
     }
 }
 
@@ -96,5 +113,13 @@ dependencies {
 
     implementation("androidx.compose.material:material-icons-extended")
 
+    // TensorFlow Lite
+    implementation("org.tensorflow:tensorflow-lite:2.14.0")
+    implementation("org.tensorflow:tensorflow-lite-support:0.4.4")
 
+    // Google ML Kit On-Device Text Recognition
+    implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.0")
+
+    // Google Generative AI (Gemini SDK)
+    implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
 }

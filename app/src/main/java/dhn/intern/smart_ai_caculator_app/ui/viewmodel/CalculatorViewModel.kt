@@ -72,5 +72,9 @@ class CalculatorViewModel(
         }
     }
 
+    fun setExpression(expr: String) {
+        _expression.value = expr
+        calculate()
+    }
 }
 

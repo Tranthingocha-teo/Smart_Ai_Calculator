@@ -97,7 +97,8 @@ fun AiMessageBubble(
     message: String,
     time: String,
     modifier: Modifier = Modifier,
-    onAction: () -> Unit = {},
+    onCopy: () -> Unit = {},
+    onRewrite: () -> Unit = {},
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -132,19 +133,17 @@ fun AiMessageBubble(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            Row(
-
-            ) {
+            Row {
                 AiMessageActions(
                     text = R.string.ai_calculator_copy,
                     icon = R.drawable.copy_ai_text,
-                    onAction = onAction,
+                    onAction = onCopy,
                 )
                 Spacer(modifier = Modifier.width(15.dp))
                 AiMessageActions(
                     text = R.string.ai_calculator_rewrite,
-                    icon = R.drawable.rewrite ,
-                    onAction = onAction,
+                    icon = R.drawable.rewrite,
+                    onAction = onRewrite,
                 )
             }
         }

@@ -1,6 +1,8 @@
 package dhn.intern.smart_ai_caculator_app.ui.components.aiCalculator
 
+import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageCapture
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
@@ -14,11 +16,18 @@ import androidx.core.content.ContextCompat
 
 @Composable
 fun CameraPreview(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onImageCaptureReady: (ImageCapture) -> Unit = {},
+    onCameraReady: (Camera) -> Unit = {}
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
+    val imageCapture = remember {
+        ImageCapture.Builder()
+            .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+            .build()
+    }
 
     AndroidView(
         modifier = modifier,
@@ -39,11 +48,14 @@ fun CameraPreview(
 
                 try {
                     cameraProvider.unbindAll()
-                    cameraProvider.bindToLifecycle(
+                    val camera = cameraProvider.bindToLifecycle(
                         lifecycleOwner,
                         cameraSelector,
-                        preview
+                        preview,
+                        imageCapture
                     )
+                    onImageCaptureReady(imageCapture)
+                    onCameraReady(camera)
                 } catch (exc: Exception) {
                     // Handle camera binding errors
                 }

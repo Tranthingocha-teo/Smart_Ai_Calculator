@@ -30,11 +30,20 @@ fun ai_caculator_screen(
     var currentMode by rememberSaveable {
         mutableStateOf(AiScanKey.SCAN)
     }
+    var chatInitialPrompt by rememberSaveable {
+        mutableStateOf("")
+    }
     Box(modifier = Modifier.fillMaxSize()) {
         when(currentMode) {
             AiScanKey.SCAN ->{
                 AiScanScreen(
                     navController = navController,
+                    onSwitchToChat = { formula ->
+                        chatInitialPrompt = if (formula.isNotBlank()) {
+                            "Hãy giải chi tiết từng bước bài toán này: $formula"
+                        } else ""
+                        currentMode = AiScanKey.CHAT
+                    },
                     modifier = Modifier
                         .fillMaxSize()
                 )
@@ -42,6 +51,8 @@ fun ai_caculator_screen(
             AiScanKey.CHAT ->{
                 AiChatScreen(
                     navController = navController,
+                    initialPrompt = chatInitialPrompt,
+                    onPromptConsumed = { chatInitialPrompt = "" },
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(bottom = 95.dp)
