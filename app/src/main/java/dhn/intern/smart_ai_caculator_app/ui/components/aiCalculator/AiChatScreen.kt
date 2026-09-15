@@ -20,14 +20,10 @@ import androidx.navigation.NavHostController
 import dhn.intern.smart_ai_caculator_app.R
 import dhn.intern.smart_ai_caculator_app.ui.components.NavBar_basic
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.collectAsState
@@ -53,11 +49,9 @@ fun AiChatScreen(
     val listState = rememberLazyListState()
     val messages by viewModel.messages.collectAsState()
     val isGenerating by viewModel.isGenerating.collectAsState()
-    val currentApiKey by viewModel.currentApiKey.collectAsState()
     val clipboardManager = LocalClipboardManager.current
 
-    var showApiKeyDialog by remember { mutableStateOf(false) }
-    var inputKey by remember(currentApiKey) { mutableStateOf(currentApiKey) }
+    var showClearConfirmDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(initialPrompt) {
         if (initialPrompt.isNotBlank()) {
@@ -66,62 +60,45 @@ fun AiChatScreen(
         }
     }
 
-    LaunchedEffect(messages.size, isGenerating) {
+    LaunchedEffect(messages.size, messages.lastOrNull()?.text) {
         if (messages.isNotEmpty()) {
             listState.animateScrollToItem(messages.size - 1)
         }
     }
 
-    if (showApiKeyDialog) {
+    if (showClearConfirmDialog) {
         AlertDialog(
-            onDismissRequest = { showApiKeyDialog = false },
+            onDismissRequest = { showClearConfirmDialog = false },
             title = {
                 Text(
-                    text = "Cấu hình Google Gemini AI",
+                    text = "Xóa cuộc trò chuyện",
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleMedium
                 )
             },
             text = {
-                Column {
-                    Text(
-                        text = "Nhập Gemini API Key để kích hoạt khả năng đàm thoại tự nhiên và giải toán nâng cao bằng mô hình Gemini 1.5 Flash.",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    OutlinedTextField(
-                        value = inputKey,
-                        onValueChange = { inputKey = it },
-                        label = { Text("Gemini API Key") },
-                        placeholder = { Text("AIzaSy...") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "💡 Lấy key miễn phí tại: aistudio.google.com",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.outline
-                    )
-                }
+                Text(
+                    text = "Bạn có chắc chắn muốn xóa toàn bộ cuộc trò chuyện để bắt đầu phiên mới không?",
+                    style = MaterialTheme.typography.bodyMedium
+                )
             },
             confirmButton = {
                 Button(
                     onClick = {
-                        viewModel.saveApiKey(inputKey)
-                        showApiKeyDialog = false
+                        viewModel.clearConversation()
+                        showClearConfirmDialog = false
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0B57D0))
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE53935))
                 ) {
-                    Text("Lưu", color = Color.White, fontWeight = FontWeight.Bold)
+                    Text("Xóa", color = Color.White, fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
                 TextButton(
-                    onClick = { showApiKeyDialog = false },
+                    onClick = { showClearConfirmDialog = false },
                     colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF565F66))
                 ) {
-                    Text("Đóng")
+                    Text("Hủy")
                 }
             }
         )
@@ -133,11 +110,10 @@ fun AiChatScreen(
         topBar = {
             NavBar_basic(
                 title = R.string.title_ai_calculator,
-                icon = R.drawable.setting,
+                icon = R.drawable.delete,
                 navController = navController,
                 onclick = {
-                    inputKey = currentApiKey
-                    showApiKeyDialog = true
+                    showClearConfirmDialog = true
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -171,23 +147,21 @@ fun AiChatScreen(
                         modifier = Modifier.padding(16.dp)
                     )
                 } else {
+                    val displayText = if (msg.text.isEmpty() && isGenerating) {
+                        "🤖 AI đang suy nghĩ và phân tích..."
+                    } else {
+                        msg.text
+                    }
                     AiMessageBubble(
-                        message = msg.text,
+                        message = displayText,
                         time = msg.timestamp,
                         modifier = Modifier.padding(16.dp),
-                        onAction = {
-                            clipboardManager.setText(AnnotatedString(msg.text))
+                        onCopy = {
+                            clipboardManager.setText(AnnotatedString(displayText))
+                        },
+                        onRewrite = {
+                            viewModel.rewriteMessage(msg.id)
                         }
-                    )
-                }
-            }
-
-            if (isGenerating) {
-                item {
-                    AiMessageBubble(
-                        message = "🤖 AI đang suy nghĩ và phân tích...",
-                        time = "Vừa xong",
-                        modifier = Modifier.padding(16.dp)
                     )
                 }
             }

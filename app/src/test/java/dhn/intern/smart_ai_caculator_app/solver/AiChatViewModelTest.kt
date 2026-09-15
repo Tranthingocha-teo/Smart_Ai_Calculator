@@ -41,7 +41,7 @@ class AiChatViewModelTest {
         val messages = viewModel.messages.value
         assertEquals(1, messages.size)
         assertFalse(messages[0].isFromUser)
-        assertTrue(messages[0].text.contains("Gia sư Toán học AI"))
+        assertTrue(messages[0].text.contains("Gia sư"))
         assertFalse(viewModel.isGenerating.value)
     }
 
@@ -115,7 +115,7 @@ class AiChatViewModelTest {
         val aiMsg = messages[2]
         assertFalse(aiMsg.isFromUser)
         assertTrue(aiMsg.text.contains("Xin chào"))
-        assertTrue(aiMsg.text.contains("Gia sư Toán học AI"))
+        assertTrue(aiMsg.text.contains("Gia sư AI"))
     }
 
     @Test
@@ -129,5 +129,37 @@ class AiChatViewModelTest {
         val aiMsg = messages[2]
         assertFalse(aiMsg.isFromUser)
         assertTrue(aiMsg.text.contains("Smart AI Calculator"))
+    }
+
+    @Test
+    fun `clearConversation resets messages to initial welcome message`() = runTest {
+        viewModel.sendMessage("2 + 2")
+        advanceUntilIdle()
+        assertEquals(3, viewModel.messages.value.size)
+
+        viewModel.clearConversation()
+        val messages = viewModel.messages.value
+        assertEquals(1, messages.size)
+        assertFalse(messages[0].isFromUser)
+        assertTrue(messages[0].text.contains("Gia sư AI"))
+        assertFalse(viewModel.isGenerating.value)
+    }
+
+    @Test
+    fun `rewriteMessage triggers alternative explanation for preceding question`() = runTest {
+        viewModel.sendMessage("3x = 12")
+        advanceUntilIdle()
+        assertEquals(3, viewModel.messages.value.size)
+
+        val aiMsg = viewModel.messages.value[2]
+        viewModel.rewriteMessage(aiMsg.id)
+        advanceUntilIdle()
+
+        val messages = viewModel.messages.value
+        assertEquals(4, messages.size)
+        val rewrittenMsg = messages[3]
+        assertFalse(rewrittenMsg.isFromUser)
+        assertTrue(rewrittenMsg.text.contains("x = 4"))
+        assertFalse(viewModel.isGenerating.value)
     }
 }
