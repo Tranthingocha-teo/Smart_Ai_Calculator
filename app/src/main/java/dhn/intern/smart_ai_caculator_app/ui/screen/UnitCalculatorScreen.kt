@@ -34,6 +34,7 @@ import dhn.intern.smart_ai_caculator_app.ui.components.unitCalculator.ItemsRowUn
 import dhn.intern.smart_ai_caculator_app.ui.components.unitCalculator.UnitInputField
 import dhn.intern.smart_ai_caculator_app.util.calculator.SmartFormatter
 import dhn.intern.smart_ai_caculator_app.util.calculator.UnitConverterUtil
+import dhn.intern.smart_ai_caculator_app.ui.currency.CurrencyConverterView
 
 @Composable
 fun UnitCalculatorScreen(
@@ -137,86 +138,101 @@ fun UnitCalculatorScreen(
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxSize()
                     .align(Alignment.TopCenter)
             ) {
+                // Thanh chọn Tab luôn hiển thị ở trên cùng
                 ItemsRowUnit(
                     unitTab = unitTab,
                     onSelectUnitTab = { selectedUnitTab, selectedCategory ->
                         unitTab = selectedUnitTab
                         currentCategory = selectedCategory
-                        val categoryUnits = unitsByCategory(selectedCategory)
-                        fromUnit = categoryUnits.firstOrNull()
-                        toUnit = categoryUnits.getOrNull(1) ?: categoryUnits.firstOrNull()
-                        fromValue = "1"
-                        recalculate(ActiveField.FROM, "1")
+                        if (selectedCategory != UnitCategory.CURRENCY) {
+                            val categoryUnits = unitsByCategory(selectedCategory)
+                            fromUnit = categoryUnits.firstOrNull()
+                            toUnit = categoryUnits.getOrNull(1) ?: categoryUnits.firstOrNull()
+                            fromValue = "1"
+                            recalculate(ActiveField.FROM, "1")
+                        }
                     }
                 )
-                Spacer(modifier = Modifier.height(15.dp))
-                UnitInputField(
-                    label = fromLabel,
-                    value = fromValue,
-                    iconRes = R.drawable.select_unit,
-                    isActive = activeField == ActiveField.FROM,
-                    onFocus = { activeField = ActiveField.FROM },
-                    onClick = {
-                        unitPickerFor = ActiveField.FROM
-                        showUnitPicker = true
-                    }
-                )
-                Spacer(modifier = Modifier.height(20.dp))
-                UnitInputField(
-                    label = toLabel,
-                    value = toValue,
-                    iconRes = R.drawable.select_unit,
-                    isActive = activeField == ActiveField.TO,
-                    onFocus = { activeField = ActiveField.TO },
-                    onClick = {
-                        unitPickerFor = ActiveField.TO
-                        showUnitPicker = true
-                    }
-                )
+
+                // Rẽ nhánh: CURRENCY hiển thị giao diện tiền tệ, danh mục khác giữ nguyên
+                if (currentCategory == UnitCategory.CURRENCY) {
+                    CurrencyConverterView(
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                } else {
+                    Spacer(modifier = Modifier.height(15.dp))
+                    UnitInputField(
+                        label = fromLabel,
+                        value = fromValue,
+                        iconRes = R.drawable.select_unit,
+                        isActive = activeField == ActiveField.FROM,
+                        onFocus = { activeField = ActiveField.FROM },
+                        onClick = {
+                            unitPickerFor = ActiveField.FROM
+                            showUnitPicker = true
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+                    UnitInputField(
+                        label = toLabel,
+                        value = toValue,
+                        iconRes = R.drawable.select_unit,
+                        isActive = activeField == ActiveField.TO,
+                        onFocus = { activeField = ActiveField.TO },
+                        onClick = {
+                            unitPickerFor = ActiveField.TO
+                            showUnitPicker = true
+                        }
+                    )
+                }
             }
-            Box(
-                modifier = Modifier
-                    .padding(bottom = 10.dp)
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-            ) {
-                UnitKeypad(
-                    onKeyPress = { key ->
-                        when (key) {
-                            "⇅" -> {
-                                val tmpValue = fromValue
-                                fromValue = toValue
-                                toValue = tmpValue
 
-                                val tmpUnit = fromUnit
-                                fromUnit = toUnit
-                                toUnit = tmpUnit
-                            }
+            // Bàn phím chỉ hiển thị cho các đơn vị đo thông thường
+            if (currentCategory != UnitCategory.CURRENCY) {
+                Box(
+                    modifier = Modifier
+                        .padding(bottom = 10.dp)
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                ) {
+                    UnitKeypad(
+                        onKeyPress = { key ->
+                            when (key) {
+                                "⇅" -> {
+                                    val tmpValue = fromValue
+                                    fromValue = toValue
+                                    toValue = tmpValue
 
-                            else -> {
-                                when (activeField) {
-                                    ActiveField.FROM -> {
-                                        fromValue = handleInput(fromValue, key)
-                                        recalculate(ActiveField.FROM, fromValue)
-                                    }
+                                    val tmpUnit = fromUnit
+                                    fromUnit = toUnit
+                                    toUnit = tmpUnit
+                                }
 
-                                    ActiveField.TO -> {
-                                        toValue = handleInput(toValue, key)
-                                        recalculate(ActiveField.TO, toValue)
-                                    }
+                                else -> {
+                                    when (activeField) {
+                                        ActiveField.FROM -> {
+                                            fromValue = handleInput(fromValue, key)
+                                            recalculate(ActiveField.FROM, fromValue)
+                                        }
 
-                                    else -> {
-                                        fromValue = handleInput(fromValue, key)
-                                        recalculate(ActiveField.FROM, fromValue)
+                                        ActiveField.TO -> {
+                                            toValue = handleInput(toValue, key)
+                                            recalculate(ActiveField.TO, toValue)
+                                        }
+
+                                        else -> {
+                                            fromValue = handleInput(fromValue, key)
+                                            recalculate(ActiveField.FROM, fromValue)
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                )
+                    )
+                }
             }
         }
     }

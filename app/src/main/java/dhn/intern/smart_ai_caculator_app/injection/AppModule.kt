@@ -14,6 +14,8 @@ val appModule = listOf(
 
     bmiModule,
 
-    exportModule
+    exportModule,
+
+    currencyModule
 )
 

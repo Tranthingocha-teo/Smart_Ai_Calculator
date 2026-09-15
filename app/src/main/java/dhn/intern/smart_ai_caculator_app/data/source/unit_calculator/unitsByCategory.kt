@@ -108,5 +108,6 @@ fun unitsByCategory(category: UnitCategory): List<UnitItemUI> =
             UnitItemUI("°F", "Fahrenheit"),
             UnitItemUI("K", "Kelvin")
         )
+        UnitCategory.CURRENCY -> emptyList()
     }
 
