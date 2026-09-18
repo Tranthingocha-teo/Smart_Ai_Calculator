@@ -8,10 +8,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -57,79 +60,40 @@ fun ConverterScreen(
     val currencies = remember { CurrenciesData.getCurrenciesData() }
 
     var showUnitPicker by remember { mutableStateOf(false) }
-    var fromCurrencies by remember {
-        mutableStateOf<CurrenciesUi?>(currencies.firstOrNull { it.title.equals("EUR", ignoreCase = true) } ?: currencies.firstOrNull())
-    }
-    var toCurrencies by remember {
-        mutableStateOf<CurrenciesUi?>(currencies.firstOrNull { it.title.equals("USD", ignoreCase = true) } ?: currencies.getOrNull(1))
-    }
-
-    var activeField by remember { mutableStateOf(ActiveField.FROM) }
     var currenciesPickerFor by remember { mutableStateOf<ActiveField?>(null) }
 
-    var fromValue by remember { mutableStateOf("1") }
-    var toValue by remember { mutableStateOf("0.0") }
+    var fromCurrencies by remember {
+        mutableStateOf<CurrenciesUi?>(
+            currencies.firstOrNull { it.title.equals("USD", ignoreCase = true) } ?: currencies.firstOrNull()
+        )
+    }
+    var toCurrencies by remember {
+        mutableStateOf<CurrenciesUi?>(
+            currencies.firstOrNull { it.title.equals("EUR", ignoreCase = true) } ?: currencies.getOrNull(1)
+        )
+    }
 
-    // Đồng bộ đơn vị ban đầu vào ViewModel
+    var fromValue by remember { mutableStateOf("1") }
+
+    // Đồng bộ mã tiền ban đầu vào ViewModel
     LaunchedEffect(fromCurrencies, toCurrencies) {
         fromCurrencies?.title?.trim()?.uppercase()?.let { viewModel.onFromCurrencyChanged(it) }
         toCurrencies?.title?.trim()?.uppercase()?.let { viewModel.onToCurrencyChanged(it) }
     }
 
-    // Hàm quy đổi 2 chiều áp dụng quy tắc làm tròn chuyên biệt
-    fun recalculate(sourceField: ActiveField, sourceValue: String) {
-        val num = sourceValue.toDoubleOrNull()
-        if (num == null) {
-            when (sourceField) {
-                ActiveField.FROM -> toValue = "0"
-                ActiveField.TO -> fromValue = "0"
-                else -> {}
-            }
-            return
-        }
+    // Kết quả lấy trực tiếp từ StateFlow trong ViewModel
+    val toValue = uiState.convertedResult.ifEmpty { "0" }
 
-        if (fromCurrencies == null || toCurrencies == null || uiState.rates.isEmpty()) return
-
-        val fromCode = fromCurrencies!!.title.trim().uppercase()
-        val toCode = toCurrencies!!.title.trim().uppercase()
-
-        when (sourceField) {
-            ActiveField.FROM -> {
-                val converted = UnitConverterUtil.convertCurrency(
-                    value = num,
-                    fromCode = fromCode,
-                    toCode = toCode,
-                    ratesToUsd = uiState.rates
-                )
-                toValue = SmartFormatter.formatCurrency(converted, toCode)
-            }
-            ActiveField.TO -> {
-                val converted = UnitConverterUtil.convertCurrency(
-                    value = num,
-                    fromCode = toCode,
-                    toCode = fromCode,
-                    ratesToUsd = uiState.rates
-                )
-                fromValue = SmartFormatter.formatCurrency(converted, fromCode)
-            }
-            else -> {}
-        }
-    }
-
-    // Tự động tính toán khi tỷ giá vừa tải xong
-    LaunchedEffect(uiState.rates, fromCurrencies, toCurrencies) {
+    // Dòng thông tin tỷ giá thời gian thực: 1 USD = x EUR
+    val realTimeRateString = remember(uiState.rates, uiState.fromCurrency, uiState.toCurrency) {
         if (uiState.rates.isNotEmpty()) {
-            recalculate(activeField, if (activeField == ActiveField.FROM) fromValue else toValue)
-        }
-    }
-
-    // Chuỗi hiển thị tỷ giá trực tiếp (ví dụ: 1 EUR = 1.08 USD)
-    val realTimeRateString = remember(uiState.rates, fromCurrencies, toCurrencies) {
-        if (fromCurrencies != null && toCurrencies != null && uiState.rates.isNotEmpty()) {
-            val fromCode = fromCurrencies!!.title.trim().uppercase()
-            val toCode = toCurrencies!!.title.trim().uppercase()
-            val oneUnitConverted = UnitConverterUtil.convertCurrency(1.0, fromCode, toCode, uiState.rates)
-            "1 $fromCode = ${SmartFormatter.formatCurrency(oneUnitConverted, toCode)} $toCode"
+            val oneUnitConverted = UnitConverterUtil.convertCurrency(
+                value = 1.0,
+                fromCode = uiState.fromCurrency,
+                toCode = uiState.toCurrency,
+                ratesToUsd = uiState.rates
+            )
+            "1 ${uiState.fromCurrency} = ${SmartFormatter.formatCurrency(oneUnitConverted, uiState.toCurrency)} ${uiState.toCurrency}"
         } else {
             "Đang cập nhật..."
         }
@@ -146,13 +110,17 @@ fun ConverterScreen(
         "${toCurrencies!!.image} ${toCurrencies!!.title} (${toCurrencies!!.des})"
     }
 
+    val statusBarTopPadding = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+
     Scaffold(
         modifier = modifier.background(MaterialTheme.colorScheme.primary),
         topBar = {
-            NavBar(
-                navController = navController,
-                title = R.string.menu_currency_converter,
-            )
+            Box(modifier = Modifier.padding(top = statusBarTopPadding + 16.dp)) {
+                NavBar(
+                    navController = navController,
+                    title = R.string.menu_currency_converter,
+                )
+            }
         }
     ) { innerPadding ->
         Box(
@@ -166,25 +134,25 @@ fun ConverterScreen(
                     .fillMaxWidth()
                     .align(Alignment.TopCenter)
             ) {
-                Spacer(modifier = Modifier.height(15.dp))
+                Spacer(modifier = Modifier.height(16.dp))
                 UnitInputField(
                     label = fromLabel,
                     value = fromValue,
                     iconRes = R.drawable.select_unit,
-                    isActive = activeField == ActiveField.FROM,
-                    onFocus = { activeField = ActiveField.FROM },
+                    isActive = true,
+                    onFocus = {},
                     onClick = {
                         currenciesPickerFor = ActiveField.FROM
                         showUnitPicker = true
                     }
                 )
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(16.dp))
                 UnitInputField(
                     label = toLabel,
                     value = toValue,
                     iconRes = R.drawable.select_unit,
-                    isActive = activeField == ActiveField.TO,
-                    onFocus = { activeField = ActiveField.TO },
+                    isActive = false,
+                    onFocus = {},
                     onClick = {
                         currenciesPickerFor = ActiveField.TO
                         showUnitPicker = true
@@ -204,12 +172,11 @@ fun ConverterScreen(
                         onRefresh = { viewModel.loadCurrencyRates() }
                     )
                 }
-
-                Spacer(modifier = Modifier.height(20.dp))
             }
+
             Box(
                 modifier = Modifier
-                    .padding(bottom = 10.dp)
+                    .padding(bottom = 16.dp)
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
             ) {
@@ -217,44 +184,19 @@ fun ConverterScreen(
                     onKeyPress = { key ->
                         when (key) {
                             "⇅" -> {
-                                val tmpValue = fromValue
-                                fromValue = toValue
-                                toValue = tmpValue
-
-                                val tmpUnit = fromCurrencies
+                                val tmpCurrencies = fromCurrencies
                                 fromCurrencies = toCurrencies
-                                toCurrencies = tmpUnit
+                                toCurrencies = tmpCurrencies
 
-                                activeField = when (activeField) {
-                                    ActiveField.FROM -> ActiveField.TO
-                                    ActiveField.TO -> ActiveField.FROM
-                                    else -> activeField
-                                }
-                                recalculate(activeField, if (activeField == ActiveField.FROM) fromValue else toValue)
-
-                                // Kích hoạt hoán đổi và lưu tức thì vào Room DB
+                                fromValue = if (toValue == "0") "1" else toValue
                                 viewModel.swapCurrencies()
+                                val amount = fromValue.toDoubleOrNull() ?: 0.0
+                                viewModel.onAmountChanged(amount)
                             }
-
                             else -> {
-                                when (activeField) {
-                                    ActiveField.FROM -> {
-                                        fromValue = handleInput(fromValue, key)
-                                        recalculate(ActiveField.FROM, fromValue)
-                                        // Gửi số tiền sang ViewModel để debounce 1500ms trước khi lưu DB
-                                        val amount = fromValue.toDoubleOrNull() ?: 0.0
-                                        viewModel.onAmountChanged(amount)
-                                    }
-
-                                    ActiveField.TO -> {
-                                        toValue = handleInput(toValue, key)
-                                        recalculate(ActiveField.TO, toValue)
-                                        val amount = toValue.toDoubleOrNull() ?: 0.0
-                                        viewModel.onAmountChanged(amount)
-                                    }
-
-                                    else -> {}
-                                }
+                                fromValue = handleInput(fromValue, key)
+                                val amount = fromValue.toDoubleOrNull() ?: 0.0
+                                viewModel.onAmountChanged(amount)
                             }
                         }
                     }
@@ -262,6 +204,7 @@ fun ConverterScreen(
             }
         }
     }
+
     if (showUnitPicker) {
         CurrenciesPickerBottomSheet(
             title = R.string.currencies_choose,
@@ -276,12 +219,10 @@ fun ConverterScreen(
                     ActiveField.FROM -> {
                         fromCurrencies = unit
                         unit?.title?.trim()?.uppercase()?.let { viewModel.onFromCurrencyChanged(it) }
-                        recalculate(ActiveField.TO, toValue)
                     }
                     ActiveField.TO -> {
                         toCurrencies = unit
                         unit?.title?.trim()?.uppercase()?.let { viewModel.onToCurrencyChanged(it) }
-                        recalculate(ActiveField.FROM, fromValue)
                     }
                     else -> {}
                 }

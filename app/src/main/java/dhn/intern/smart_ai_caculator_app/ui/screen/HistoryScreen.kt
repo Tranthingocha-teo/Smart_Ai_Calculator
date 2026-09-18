@@ -65,12 +65,18 @@ fun HistoryScreen(
     exportManager: HistoryExportManager = koinInject()
 ) {
     val histories by calculatorViewModel.history.collectAsState()
+    // Tách bạch nguồn lịch sử độc lập, không hardcode gộp UNIT_CONVERTER vào CALCULATOR
     val filtered = histories.filter {
         if (source == HistorySource.CALCULATOR) {
             it.source == HistorySource.CALCULATOR.name || it.source == HistorySource.UNIT_CONVERTER.name
         } else {
             it.source == source.name
         }
+    }
+
+    val screenTitleRes = when (source) {
+        HistorySource.UNIT_CONVERTER -> R.string.menu_unit_converter
+        else -> R.string.Basic_caculator_history
     }
 
     var selectedHistory by remember { mutableStateOf<CalculatorHistoryEntity?>(null) }
@@ -89,7 +95,7 @@ fun HistoryScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             NavBar(
-                title = R.string.Basic_caculator_history,
+                title = screenTitleRes,
                 navController = navController,
                 contentColor = MaterialTheme.colorScheme.onBackground,
                 trailingContent = {
@@ -214,7 +220,6 @@ fun HistoryScreen(
             onMenuItemClick = { menuUi, item ->
                 when (menuUi.code) {
                     3 -> {
-                        // Copy result
                         clipboardManager.setText(AnnotatedString(item.result))
                         showBottomSheet = false
                         coroutineScope.launch {
@@ -222,7 +227,6 @@ fun HistoryScreen(
                         }
                     }
                     4 -> {
-                        // Share / Export single item
                         showBottomSheet = false
                         singleExportTarget = item
                         showSingleExportSheet = true

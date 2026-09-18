@@ -1,6 +1,5 @@
 package dhn.intern.smart_ai_caculator_app
 
-import dhn.intern.smart_ai_caculator_app.data.constant.DefaultCurrencyRates
 import dhn.intern.smart_ai_caculator_app.data.local.dao.CurrencyRateDao
 import dhn.intern.smart_ai_caculator_app.data.local.entity.CurrencyRateEntity
 import dhn.intern.smart_ai_caculator_app.data.remote.CurrencyApiService
@@ -8,7 +7,6 @@ import dhn.intern.smart_ai_caculator_app.data.remote.dto.CurrencyResponseDto
 import dhn.intern.smart_ai_caculator_app.data.repository.CurrencyRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
-import org.junit.Before
 import org.junit.Test
 import java.io.IOException
 

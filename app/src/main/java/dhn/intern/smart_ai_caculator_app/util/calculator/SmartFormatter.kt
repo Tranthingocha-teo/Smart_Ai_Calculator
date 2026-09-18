@@ -40,8 +40,8 @@ object SmartFormatter {
 
     /**
      * Formats currency conversions:
-     * - Integer rounding for zero-decimal currencies (VND, JPY)
-     * - Up to 4 decimal places for standard fiat currencies (USD, EUR, GBP, etc.)
+     * - Integer rounding for zero-decimal currencies (VND, JPY, KRW, etc.)
+     * - Minimum 2 and up to 4 decimal places for standard fiat currencies (USD, EUR, GBP, etc.)
      */
     fun formatCurrency(value: Double, currencyCode: String): String {
         if (value.isNaN() || value.isInfinite()) return "0"
@@ -51,8 +51,9 @@ object SmartFormatter {
             return Math.round(value).toString()
         }
 
-        val df = DecimalFormat("0.####", symbols)
-        return cleanFormattedString(df.format(value))
+        // "0.00##" đảm bảo luôn giữ tối thiểu 2 chữ số thập phân (1.50, 2.00) và tối đa 4 số (1.2345)
+        val df = DecimalFormat("0.00##", symbols)
+        return df.format(value)
     }
 
     private fun cleanFormattedString(formatted: String): String {

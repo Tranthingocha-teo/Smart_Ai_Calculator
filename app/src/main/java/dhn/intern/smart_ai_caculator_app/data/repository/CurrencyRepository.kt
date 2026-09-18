@@ -1,9 +1,9 @@
 package dhn.intern.smart_ai_caculator_app.data.repository
 
-import dhn.intern.smart_ai_caculator_app.data.constant.DefaultCurrencyRates
 import dhn.intern.smart_ai_caculator_app.data.local.dao.CurrencyRateDao
 import dhn.intern.smart_ai_caculator_app.data.local.entity.CurrencyRateEntity
 import dhn.intern.smart_ai_caculator_app.data.remote.CurrencyApiService
+import dhn.intern.smart_ai_caculator_app.data.source.currencies.DefaultCurrencyRates
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -46,7 +46,7 @@ class CurrencyRepository(
         }
 
         // Bước dự phòng 2: Room DB cũng trống (app mới cài lần đầu chưa bật mạng bao giờ)
-        return@withContext DefaultCurrencyRates.STATIC_RATES
+        return@withContext DefaultCurrencyRates.FALLBACK_RATES
     }
 
     /**

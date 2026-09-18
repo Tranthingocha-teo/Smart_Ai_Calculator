@@ -2,9 +2,9 @@ package dhn.intern.smart_ai_caculator_app.ui.currency
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dhn.intern.smart_ai_caculator_app.data.constant.DefaultCurrencyRates
 import dhn.intern.smart_ai_caculator_app.data.repository.CalculatorHistoryRepository
 import dhn.intern.smart_ai_caculator_app.data.repository.CurrencyRepository
+import dhn.intern.smart_ai_caculator_app.data.source.currencies.DefaultCurrencyRates
 import dhn.intern.smart_ai_caculator_app.util.calculator.SmartFormatter
 import dhn.intern.smart_ai_caculator_app.util.calculator.UnitConverterUtil
 import kotlinx.coroutines.Job
@@ -23,7 +23,7 @@ data class CurrencyUiState(
     val toCurrency: String = "EUR",
     val inputAmount: Double = 1.0,
     val convertedResult: String = "",
-    val rates: Map<String, Double> = DefaultCurrencyRates.STATIC_RATES,
+    val rates: Map<String, Double> = DefaultCurrencyRates.FALLBACK_RATES,
     val lastUpdatedText: String = "Dữ liệu ngoại tuyến",
     val isLoading: Boolean = false,
     val errorMessage: String? = null
