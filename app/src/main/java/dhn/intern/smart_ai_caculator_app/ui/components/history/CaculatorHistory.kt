@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -45,6 +47,8 @@ fun CaculatorHistory(
     history: CalculatorHistoryEntity,
     onClick: () -> Unit = {},
 ) {
+    val isUnitConverter = history.source == HistorySource.UNIT_CONVERTER.name
+
     val (badgeText, badgeBgColor, badgeTextColor) = when (history.source) {
         HistorySource.GRAPHING_CALCULATOR.name -> Triple(
             stringResource(R.string.history_source_graphing),
@@ -55,6 +59,11 @@ fun CaculatorHistory(
             stringResource(R.string.history_source_ai),
             Color(0xFF3B82F6).copy(alpha = 0.12f),
             Color(0xFF2563EB)
+        )
+        HistorySource.UNIT_CONVERTER.name -> Triple(
+            "Chuyển đổi",
+            Color(0xFFEA580C).copy(alpha = 0.12f),
+            Color(0xFFEA580C)
         )
         else -> Triple(
             stringResource(R.string.history_source_basic),
@@ -68,8 +77,12 @@ fun CaculatorHistory(
         sdf.format(Date(history.timestamp))
     }
 
-    val displayResult = remember(history.result) {
-        if (history.result.startsWith("=")) history.result else "= ${history.result}"
+    val displayResult = remember(history.result, isUnitConverter) {
+        if (isUnitConverter || history.result.startsWith("=")) {
+            history.result
+        } else {
+            "= ${history.result}"
+        }
     }
 
     Card(
@@ -155,7 +168,7 @@ fun CaculatorHistory(
 
             Spacer(modifier = Modifier.height(2.dp))
 
-            // Middle: Expression
+            // Middle: Expression (Số & Đơn vị gốc)
             Text(
                 text = history.expression,
                 style = MaterialTheme.typography.bodyMedium,
@@ -168,18 +181,43 @@ fun CaculatorHistory(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Bottom: Result with bold accent
-            Text(
-                text = displayResult,
-                style = MaterialTheme.typography.headlineMedium,
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground,
-                textAlign = TextAlign.Start,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.fillMaxWidth()
-            )
+            // Bottom: Result (Có kèm Icon hoán đổi 2 chiều nếu là Chuyển đổi đơn vị)
+            if (isUnitConverter) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.SwapHoriz,
+                        contentDescription = "Chuyển đổi",
+                        tint = Color(0xFFEA580C),
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Text(
+                        text = displayResult,
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontSize = 26.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        textAlign = TextAlign.Start,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            } else {
+                Text(
+                    text = displayResult,
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    textAlign = TextAlign.Start,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
     }
 }

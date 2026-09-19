@@ -24,13 +24,13 @@ class CalculatorViewModel(
     private val _result = MutableStateFlow("0")
     val result = _result.asStateFlow()
 
+    // Lắng nghe toàn bộ bản ghi từ database
     val history = historyRepo.getHistory()
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5_000),
             emptyList()
         )
-
 
     fun onKeyPress(key: String) {
         when (key) {
@@ -77,4 +77,3 @@ class CalculatorViewModel(
         calculate()
     }
 }
-

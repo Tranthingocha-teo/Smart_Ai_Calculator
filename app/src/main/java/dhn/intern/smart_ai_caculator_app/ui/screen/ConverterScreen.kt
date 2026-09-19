@@ -8,16 +8,21 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,24 +44,60 @@ import dhn.intern.smart_ai_caculator_app.ui.components.NavBar
 import dhn.intern.smart_ai_caculator_app.ui.components.keypad.UnitKeypad
 import dhn.intern.smart_ai_caculator_app.ui.components.keypad.handleInput
 import dhn.intern.smart_ai_caculator_app.ui.components.unitCalculator.UnitInputField
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import dhn.intern.smart_ai_caculator_app.ui.currency.CurrencyCalculatorViewModel
+import dhn.intern.smart_ai_caculator_app.util.calculator.SmartFormatter
+import dhn.intern.smart_ai_caculator_app.util.calculator.UnitConverterUtil
+import org.koin.androidx.compose.koinViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ConverterScreen(
-    modifier: Modifier,
-    navController: NavHostController
+    modifier: Modifier = Modifier,
+    navController: NavHostController,
+    viewModel: CurrencyCalculatorViewModel = koinViewModel()
 ) {
-    var showUnitPicker by remember { mutableStateOf(false) }
-    var fromCurrencies by remember { mutableStateOf<CurrenciesUi?>(null) }
-    var toCurrencies by remember { mutableStateOf<CurrenciesUi?>(null) }
-    val currencies = CurrenciesData.getCurrenciesData()
+    val uiState by viewModel.uiState.collectAsState()
+    val currencies = remember { CurrenciesData.getCurrenciesData() }
 
-    var activeField by remember { mutableStateOf(ActiveField.FROM) }
+    var showUnitPicker by remember { mutableStateOf(false) }
     var currenciesPickerFor by remember { mutableStateOf<ActiveField?>(null) }
 
-    var fromValue by remember { mutableStateOf("0.0") }
-    var toValue by remember { mutableStateOf("0.0") }
+    var fromCurrencies by remember {
+        mutableStateOf<CurrenciesUi?>(
+            currencies.firstOrNull { it.title.equals("USD", ignoreCase = true) } ?: currencies.firstOrNull()
+        )
+    }
+    var toCurrencies by remember {
+        mutableStateOf<CurrenciesUi?>(
+            currencies.firstOrNull { it.title.equals("EUR", ignoreCase = true) } ?: currencies.getOrNull(1)
+        )
+    }
+
+    var fromValue by remember { mutableStateOf("1") }
+
+    // Đồng bộ mã tiền ban đầu vào ViewModel
+    LaunchedEffect(fromCurrencies, toCurrencies) {
+        fromCurrencies?.title?.trim()?.uppercase()?.let { viewModel.onFromCurrencyChanged(it) }
+        toCurrencies?.title?.trim()?.uppercase()?.let { viewModel.onToCurrencyChanged(it) }
+    }
+
+    // Kết quả lấy trực tiếp từ StateFlow trong ViewModel
+    val toValue = uiState.convertedResult.ifEmpty { "0" }
+
+    // Dòng thông tin tỷ giá thời gian thực: 1 USD = x EUR
+    val realTimeRateString = remember(uiState.rates, uiState.fromCurrency, uiState.toCurrency) {
+        if (uiState.rates.isNotEmpty()) {
+            val oneUnitConverted = UnitConverterUtil.convertCurrency(
+                value = 1.0,
+                fromCode = uiState.fromCurrency,
+                toCode = uiState.toCurrency,
+                ratesToUsd = uiState.rates
+            )
+            "1 ${uiState.fromCurrency} = ${SmartFormatter.formatCurrency(oneUnitConverted, uiState.toCurrency)} ${uiState.toCurrency}"
+        } else {
+            "Đang cập nhật..."
+        }
+    }
 
     val fromLabel = if (fromCurrencies == null) {
         stringResource(R.string.currencies_please_choose)
@@ -68,14 +109,18 @@ fun ConverterScreen(
     } else {
         "${toCurrencies!!.image} ${toCurrencies!!.title} (${toCurrencies!!.des})"
     }
+
+    val statusBarTopPadding = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+
     Scaffold(
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.primary),
+        modifier = modifier.background(MaterialTheme.colorScheme.primary),
         topBar = {
-            NavBar(
-                navController = navController,
-                title = R.string.menu_currency_converter,
-            )
+            Box(modifier = Modifier.padding(top = statusBarTopPadding + 16.dp)) {
+                NavBar(
+                    navController = navController,
+                    title = R.string.menu_currency_converter,
+                )
+            }
         }
     ) { innerPadding ->
         Box(
@@ -89,25 +134,25 @@ fun ConverterScreen(
                     .fillMaxWidth()
                     .align(Alignment.TopCenter)
             ) {
-                Spacer(modifier = Modifier.height(15.dp))
+                Spacer(modifier = Modifier.height(16.dp))
                 UnitInputField(
                     label = fromLabel,
                     value = fromValue,
                     iconRes = R.drawable.select_unit,
-                    isActive = activeField == ActiveField.FROM,
-                    onFocus = { activeField = ActiveField.FROM },
+                    isActive = true,
+                    onFocus = {},
                     onClick = {
                         currenciesPickerFor = ActiveField.FROM
                         showUnitPicker = true
                     }
                 )
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(16.dp))
                 UnitInputField(
                     label = toLabel,
                     value = toValue,
                     iconRes = R.drawable.select_unit,
-                    isActive = activeField == ActiveField.TO,
-                    onFocus = { activeField = ActiveField.TO },
+                    isActive = false,
+                    onFocus = {},
                     onClick = {
                         currenciesPickerFor = ActiveField.TO
                         showUnitPicker = true
@@ -118,17 +163,20 @@ fun ConverterScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(end  = 16.dp),
+                        .padding(end = 16.dp),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    ConverterRealTime()
+                    ConverterRealTime(
+                        rateText = realTimeRateString,
+                        updatedText = uiState.lastUpdatedText,
+                        onRefresh = { viewModel.loadCurrencyRates() }
+                    )
                 }
-
-                Spacer(modifier = Modifier.height(20.dp))
             }
+
             Box(
                 modifier = Modifier
-                    .padding(bottom = 10.dp)
+                    .padding(bottom = 16.dp)
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
             ) {
@@ -136,31 +184,19 @@ fun ConverterScreen(
                     onKeyPress = { key ->
                         when (key) {
                             "⇅" -> {
-                                val tmpValue = fromValue
-                                fromValue = toValue
-                                toValue = tmpValue
-
-                                val tmpUnit = fromCurrencies
+                                val tmpCurrencies = fromCurrencies
                                 fromCurrencies = toCurrencies
-                                toCurrencies = tmpUnit
+                                toCurrencies = tmpCurrencies
 
-                                activeField = when (activeField) {
-                                    ActiveField.FROM -> ActiveField.TO
-                                    ActiveField.TO -> ActiveField.FROM
-                                    else -> activeField
-                                }
+                                fromValue = if (toValue == "0") "1" else toValue
+                                viewModel.swapCurrencies()
+                                val amount = fromValue.toDoubleOrNull() ?: 0.0
+                                viewModel.onAmountChanged(amount)
                             }
-
                             else -> {
-                                when (activeField) {
-                                    ActiveField.FROM ->
-                                        fromValue = handleInput(fromValue, key)
-
-                                    ActiveField.TO ->
-                                        toValue = handleInput(toValue, key)
-
-                                    else -> {}
-                                }
+                                fromValue = handleInput(fromValue, key)
+                                val amount = fromValue.toDoubleOrNull() ?: 0.0
+                                viewModel.onAmountChanged(amount)
                             }
                         }
                     }
@@ -168,6 +204,7 @@ fun ConverterScreen(
             }
         }
     }
+
     if (showUnitPicker) {
         CurrenciesPickerBottomSheet(
             title = R.string.currencies_choose,
@@ -176,11 +213,17 @@ fun ConverterScreen(
                 ActiveField.FROM -> fromCurrencies
                 ActiveField.TO -> toCurrencies
                 else -> null
-            } as CurrenciesUi?,
+            },
             onSelect = { unit ->
                 when (currenciesPickerFor) {
-                    ActiveField.FROM -> fromCurrencies = unit
-                    ActiveField.TO -> toCurrencies = unit
+                    ActiveField.FROM -> {
+                        fromCurrencies = unit
+                        unit?.title?.trim()?.uppercase()?.let { viewModel.onFromCurrencyChanged(it) }
+                    }
+                    ActiveField.TO -> {
+                        toCurrencies = unit
+                        unit?.title?.trim()?.uppercase()?.let { viewModel.onToCurrencyChanged(it) }
+                    }
                     else -> {}
                 }
                 showUnitPicker = false
@@ -191,19 +234,15 @@ fun ConverterScreen(
         )
     }
 }
-@RequiresApi(Build.VERSION_CODES.O)
+
 @Composable
 fun ConverterRealTime(
-    rateText: String = "1 USD = 87.33 INR",
-    updatedAt: LocalDateTime? = LocalDateTime.now(),
+    rateText: String,
+    updatedText: String,
     onRefresh: () -> Unit = {}
 ) {
-    val formatter = DateTimeFormatter.ofPattern("HH:mm,MMMdd,yyyy")
-    val updatedLabel = updatedAt?.let { "Rates of ${it.format(formatter)}" } ?: ""
-
     Column(
-        modifier = Modifier
-            .padding(vertical = 8.dp),
+        modifier = Modifier.padding(vertical = 8.dp),
         horizontalAlignment = Alignment.End
     ) {
         Text(
@@ -218,13 +257,13 @@ fun ConverterRealTime(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = updatedLabel,
+                text = updatedText,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onBackground
             )
             IconButton(onClick = onRefresh) {
                 Icon(
-                    painter = painterResource(R.drawable.rewrite) ,
+                    painter = painterResource(R.drawable.rewrite),
                     contentDescription = "Refresh rates",
                     tint = MaterialTheme.colorScheme.outline
                 )
@@ -232,6 +271,8 @@ fun ConverterRealTime(
         }
     }
 }
+
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun ConverterScreenPreview() {

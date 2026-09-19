@@ -40,19 +40,24 @@ object SmartFormatter {
 
     /**
      * Formats currency conversions:
-     * - Integer rounding for zero-decimal currencies (VND, JPY)
-     * - Up to 4 decimal places for standard fiat currencies (USD, EUR, GBP, etc.)
+     * - Integer rounding for zero-decimal currencies (VND, JPY, KRW, etc.)
+     * - Minimum 2 and up to 4 decimal places for standard fiat currencies (USD, EUR, GBP, etc.)
      */
     fun formatCurrency(value: Double, currencyCode: String): String {
-        if (value.isNaN() || value.isInfinite()) return "0"
+        val code = currencyCode.uppercase()
 
-        val zeroDecimalCurrencies = setOf("VND", "JPY", "KRW", "CLP", "HUF", "TWD")
-        if (zeroDecimalCurrencies.contains(currencyCode.uppercase())) {
-            return Math.round(value).toString()
+        // 1. VND và JPY: làm tròn số nguyên không lấy phần thập phân
+        if (code == "VND" || code == "JPY") {
+            val rounded = BigDecimal(value.toString()).setScale(0, RoundingMode.HALF_UP)
+            return rounded.toPlainString()
         }
 
-        val df = DecimalFormat("0.####", symbols)
-        return cleanFormattedString(df.format(value))
+        // 2. Các tiền tệ khác (USD, EUR, GBP...): làm tròn tối đa 4 chữ số thập phân, bỏ số 0 vô nghĩa ở đuôi
+        val symbols = DecimalFormatSymbols(Locale.US)
+        val df = DecimalFormat("#.####", symbols).apply {
+            roundingMode = java.math.RoundingMode.HALF_UP
+        }
+        return df.format(value)
     }
 
     private fun cleanFormattedString(formatted: String): String {

@@ -7,6 +7,13 @@ object UnitData {
     fun getUnitData(): List<UnitUi> {
         return listOf(
             UnitUi(
+                image = null,
+                iconText = "\uD83D\uDCB1", // 💱 Icon tiền tệ
+                title = R.string.menu_currency_converter, // String tài nguyên tên "Tiền tệ"
+                navHost = "currency_unit_converter",
+                category = UnitCategory.CURRENCY
+            ),
+            UnitUi(
                 image = R.drawable.length,
                 iconText = null,
                 title = R.string.unit_calculator_length,

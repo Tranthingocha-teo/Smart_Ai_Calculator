@@ -38,7 +38,7 @@ fun unitsByCategory(category: UnitCategory): List<UnitItemUI> =
             UnitItemUI("cL", "Centiliter"),
             UnitItemUI("dL", "Deciliter"),
             UnitItemUI("hL", "Hectoliter"),
-            UnitItemUI("kL", "Kiloliter"),
+            UnitItemUI("kL", "Kiliter"),
             UnitItemUI("m³", "Cubic meter"),
             UnitItemUI("cm³", "Cubic centimeter"),
             UnitItemUI("gal", "Gallon (US)"),
@@ -50,7 +50,7 @@ fun unitsByCategory(category: UnitCategory): List<UnitItemUI> =
         UnitCategory.TIME -> listOf(
             UnitItemUI("H", "Hour"),
             UnitItemUI("s", "Second"),
-            UnitItemUI("ms", "millisecond"),
+            UnitItemUI("ms", "Millisecond"),
             UnitItemUI("µs", "Microsecond"),
             UnitItemUI("ns", "Nanosecond"),
             UnitItemUI("m", "Minute"),
@@ -108,5 +108,19 @@ fun unitsByCategory(category: UnitCategory): List<UnitItemUI> =
             UnitItemUI("°F", "Fahrenheit"),
             UnitItemUI("K", "Kelvin")
         )
+        // Cập nhật danh sách tiền tệ toàn cầu cho Ticket #31
+        UnitCategory.CURRENCY -> listOf(
+            UnitItemUI("USD", "United States Dollar"),
+            UnitItemUI("EUR", "Euro"),
+            UnitItemUI("VND", "Vietnamese Dong"),
+            UnitItemUI("JPY", "Japanese Yen"),
+            UnitItemUI("GBP", "British Pound"),
+            UnitItemUI("AUD", "Australian Dollar"),
+            UnitItemUI("CAD", "Canadian Dollar"),
+            UnitItemUI("CHF", "Swiss Franc"),
+            UnitItemUI("CNY", "Chinese Yuan"),
+            UnitItemUI("KRW", "South Korean Won"),
+            UnitItemUI("SGD", "Singapore Dollar"),
+            UnitItemUI("THB", "Thai Baht")
+        )
     }
-

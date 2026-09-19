@@ -155,6 +155,7 @@ object UnitConverterUtil {
             UnitCategory.ANGLE -> angleRatios
             UnitCategory.FUEL -> fuelRatios
             UnitCategory.TEMPERATURE -> emptyMap() // Handled in #30
+            UnitCategory.CURRENCY -> emptyMap()    // Tiền tệ dùng tỷ giá động qua convertCurrency bên dưới
         }
 
         val fromRatio = ratioMap[fromUnitId] ?: return value
@@ -163,5 +164,25 @@ object UnitConverterUtil {
         // Convert to base unit, then to target unit
         val valueInBase = value * fromRatio
         return valueInBase / toRatio
+    }
+
+    /**
+     * Quy đổi tiền tệ dựa trên bảng tỷ giá động (so với USD) lấy từ CurrencyRepository
+     */
+    fun convertCurrency(
+        value: Double,
+        fromCode: String,
+        toCode: String,
+        ratesToUsd: Map<String, Double>
+    ): Double {
+        if (value == 0.0 || fromCode == toCode) return value
+
+        val fromRate = ratesToUsd[fromCode] ?: return value
+        val toRate = ratesToUsd[toCode] ?: return value
+
+        // 1 USD = fromRate đơn vị 'fromCode' -> Đổi sang USD trước
+        val valueInUsd = value / fromRate
+        // Từ USD đổi sang 'toCode'
+        return valueInUsd * toRate
     }
 }
