@@ -5,6 +5,7 @@ import dhn.intern.smart_ai_caculator_app.data.local.entity.CurrencyRateEntity
 import dhn.intern.smart_ai_caculator_app.data.remote.CurrencyApiService
 import dhn.intern.smart_ai_caculator_app.data.remote.dto.CurrencyResponseDto
 import dhn.intern.smart_ai_caculator_app.data.repository.CurrencyRepository
+import dhn.intern.smart_ai_caculator_app.data.source.currencies.DefaultCurrencyRates
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -55,6 +56,6 @@ class CurrencyRepositoryTest {
 
         val result = repository.getRates()
 
-        assertEquals(DefaultCurrencyRates.STATIC_RATES["VND"], result["VND"])
+        assertEquals(DefaultCurrencyRates.FALLBACK_RATES["VND"], result["VND"])
     }
 }
