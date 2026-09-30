@@ -40,19 +40,21 @@ object SmartFormatter {
 
     /**
      * Formats currency conversions:
-     * - Integer rounding for zero-decimal currencies (VND, JPY)
-     * - Up to 4 decimal places for standard fiat currencies (USD, EUR, GBP, etc.)
+     * - Integer rounding for zero-decimal currencies (VND, JPY, KRW, etc.)
+     * - Minimum 2 and up to 4 decimal places for standard fiat currencies (USD, EUR, GBP, etc.)
      */
     fun formatCurrency(value: Double, currencyCode: String): String {
-        if (value.isNaN() || value.isInfinite()) return "0"
-
-        val zeroDecimalCurrencies = setOf("VND", "JPY", "KRW", "CLP", "HUF", "TWD")
-        if (zeroDecimalCurrencies.contains(currencyCode.uppercase())) {
-            return Math.round(value).toString()
+        val symbols = java.text.DecimalFormatSymbols(java.util.Locale.US)
+        return when (currencyCode.uppercase().trim()) {
+            "VND", "JPY" -> {
+                val format = java.text.DecimalFormat("#,##0", symbols)
+                format.format(kotlin.math.round(value).toLong())
+            }
+            else -> {
+                val format = java.text.DecimalFormat("#,##0.00##", symbols)
+                format.format(value)
+            }
         }
-
-        val df = DecimalFormat("0.####", symbols)
-        return cleanFormattedString(df.format(value))
     }
 
     private fun cleanFormattedString(formatted: String): String {

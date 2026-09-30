@@ -28,6 +28,17 @@ class CalculatorHistoryRepository(
         )
     }
 
+    // Hàm lưu lịch sử chuyển đổi đơn vị/tiền tệ cho Ticket #33
+    suspend fun saveUnitConverter(expression: String, result: String) {
+        dao.insert(
+            CalculatorHistoryEntity(
+                expression = expression,
+                result = result,
+                source = HistorySource.UNIT_CONVERTER.name
+            )
+        )
+    }
+
     suspend fun saveGraphing(
         expression: String,
         colorHex: String,

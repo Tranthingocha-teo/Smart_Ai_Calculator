@@ -13,5 +13,7 @@ enum class UnitCategory {
     ENERGY,
     ANGLE,
     FUEL,
-    TEMPERATURE
+    TEMPERATURE,
+
+    CURRENCY
 }

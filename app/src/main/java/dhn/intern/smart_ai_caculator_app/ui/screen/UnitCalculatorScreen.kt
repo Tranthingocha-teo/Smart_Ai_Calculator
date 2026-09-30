@@ -4,129 +4,83 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import dhn.intern.smart_ai_caculator_app.R
-import dhn.intern.smart_ai_caculator_app.data.source.unit_calculator.UnitData
-import dhn.intern.smart_ai_caculator_app.data.source.unit_calculator.UnitItemUI
-import dhn.intern.smart_ai_caculator_app.data.source.unit_calculator.unitsByCategory
 import dhn.intern.smart_ai_caculator_app.enum.ActiveField
-import dhn.intern.smart_ai_caculator_app.enum.UnitCategory
+import dhn.intern.smart_ai_caculator_app.enum.HistorySource
+import dhn.intern.smart_ai_caculator_app.navigation.NavScreen
 import dhn.intern.smart_ai_caculator_app.ui.components.NavBar
 import dhn.intern.smart_ai_caculator_app.ui.components.UnitPickerBottomSheet
 import dhn.intern.smart_ai_caculator_app.ui.components.keypad.UnitKeypad
-import dhn.intern.smart_ai_caculator_app.ui.components.keypad.handleInput
 import dhn.intern.smart_ai_caculator_app.ui.components.unitCalculator.ItemsRowUnit
 import dhn.intern.smart_ai_caculator_app.ui.components.unitCalculator.UnitInputField
-import dhn.intern.smart_ai_caculator_app.util.calculator.SmartFormatter
-import dhn.intern.smart_ai_caculator_app.util.calculator.UnitConverterUtil
+import dhn.intern.smart_ai_caculator_app.ui.viewmodel.UnitCalculatorViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun UnitCalculatorScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: UnitCalculatorViewModel = koinViewModel()
 ) {
-    var showUnitPicker by remember { mutableStateOf(false) }
-    val defaultTab = UnitData.getUnitData()
-        .first { it.navHost == "length_unit_converter" }
-    var unitTab by remember { mutableStateOf(defaultTab) }
-    var currentCategory by remember { mutableStateOf(UnitCategory.LENGTH) }
+    val state by viewModel.uiState.collectAsState()
 
-    val units = unitsByCategory(currentCategory)
-    var fromUnit by remember {
-        mutableStateOf<UnitItemUI?>(
-            units.firstOrNull { it.lable == "m" } ?: units.firstOrNull()
-        )
-    }
-    var toUnit by remember {
-        mutableStateOf<UnitItemUI?>(
-            units.firstOrNull { it.lable == "cm" } ?: units.getOrNull(1) ?: units.firstOrNull()
-        )
-    }
-
-    var activeField by remember { mutableStateOf(ActiveField.FROM) }
-    var unitPickerFor by remember { mutableStateOf<ActiveField?>(null) }
-
-    var fromValue by remember { mutableStateOf("1") }
-    var toValue by remember {
-        val initialConverted = if (fromUnit != null && toUnit != null) {
-            SmartFormatter.format(
-                UnitConverterUtil.convert(1.0, fromUnit!!.lable, toUnit!!.lable, currentCategory)
-            )
-        } else {
-            "0"
-        }
-        mutableStateOf(initialConverted)
-    }
-
-    fun recalculate(sourceField: ActiveField, sourceValue: String) {
-        val num = sourceValue.toDoubleOrNull()
-        if (num == null) {
-            when (sourceField) {
-                ActiveField.FROM -> toValue = "0"
-                ActiveField.TO -> fromValue = "0"
-                else -> {}
-            }
-            return
-        }
-
-        if (fromUnit == null || toUnit == null) return
-
-        when (sourceField) {
-            ActiveField.FROM -> {
-                val converted = UnitConverterUtil.convert(
-                    value = num,
-                    fromUnitId = fromUnit!!.lable,
-                    toUnitId = toUnit!!.lable,
-                    category = currentCategory
-                )
-                toValue = SmartFormatter.format(converted)
-            }
-            ActiveField.TO -> {
-                val converted = UnitConverterUtil.convert(
-                    value = num,
-                    fromUnitId = toUnit!!.lable,
-                    toUnitId = fromUnit!!.lable,
-                    category = currentCategory
-                )
-                fromValue = SmartFormatter.format(converted)
-            }
-            else -> {}
-        }
-    }
-
-    val fromLabel = if (fromUnit == null) {
+    val fromLabel = if (state.fromUnit == null) {
         stringResource(R.string.unit_calculator_please_choose)
     } else {
-        "${fromUnit!!.lable} (${fromUnit!!.des})"
+        "${state.fromUnit!!.lable} (${state.fromUnit!!.des})"
     }
-    val toLabel = if (toUnit == null) {
+    val toLabel = if (state.toUnit == null) {
         stringResource(R.string.unit_calculator_please_choose)
     } else {
-        "${toUnit!!.lable} (${toUnit!!.des})"
+        "${state.toUnit!!.lable} (${state.toUnit!!.des})"
     }
+
+    val statusBarTopPadding = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
 
     Scaffold(
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.primary),
+        modifier = Modifier.background(MaterialTheme.colorScheme.primary),
         topBar = {
-            NavBar(
-                navController = navController,
-                title = R.string.menu_unit_converter,
-            )
+            Box(modifier = Modifier.padding(top = statusBarTopPadding + 16.dp)) {
+                NavBar(
+                    navController = navController,
+                    title = R.string.menu_unit_converter,
+                    // Trong UnitCalculatorScreen.kt, phần trailingContent của NavBar:
+                    trailingContent = {
+                        IconButton(
+                            onClick = {
+                                navController.navigate(
+                                    NavScreen.HistoryScreen.createRoute(HistorySource.UNIT_CONVERTER)
+                                )
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.history),
+                                contentDescription = "History",
+                                tint = MaterialTheme.colorScheme.onBackground
+                            )
+                        }
+                    }
+                )
+            }
         }
     ) { paddingValues ->
         Box(
@@ -137,115 +91,65 @@ fun UnitCalculatorScreen(
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxSize()
                     .align(Alignment.TopCenter)
             ) {
                 ItemsRowUnit(
-                    unitTab = unitTab,
+                    unitTab = state.unitTab,
                     onSelectUnitTab = { selectedUnitTab, selectedCategory ->
-                        unitTab = selectedUnitTab
-                        currentCategory = selectedCategory
-                        val categoryUnits = unitsByCategory(selectedCategory)
-                        fromUnit = categoryUnits.firstOrNull()
-                        toUnit = categoryUnits.getOrNull(1) ?: categoryUnits.firstOrNull()
-                        fromValue = "1"
-                        recalculate(ActiveField.FROM, "1")
+                        viewModel.selectCategory(selectedUnitTab, selectedCategory)
                     }
                 )
-                Spacer(modifier = Modifier.height(15.dp))
+
+                Spacer(modifier = Modifier.height(16.dp))
                 UnitInputField(
                     label = fromLabel,
-                    value = fromValue,
+                    value = state.fromValue,
                     iconRes = R.drawable.select_unit,
-                    isActive = activeField == ActiveField.FROM,
-                    onFocus = { activeField = ActiveField.FROM },
-                    onClick = {
-                        unitPickerFor = ActiveField.FROM
-                        showUnitPicker = true
-                    }
+                    isActive = state.activeField == ActiveField.FROM,
+                    onFocus = { viewModel.onFocusChanged(ActiveField.FROM) },
+                    onClick = { viewModel.openPicker(ActiveField.FROM) }
                 )
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(16.dp))
                 UnitInputField(
                     label = toLabel,
-                    value = toValue,
+                    value = state.toValue,
                     iconRes = R.drawable.select_unit,
-                    isActive = activeField == ActiveField.TO,
-                    onFocus = { activeField = ActiveField.TO },
-                    onClick = {
-                        unitPickerFor = ActiveField.TO
-                        showUnitPicker = true
-                    }
+                    isActive = state.activeField == ActiveField.TO,
+                    onFocus = { viewModel.onFocusChanged(ActiveField.TO) },
+                    onClick = { viewModel.openPicker(ActiveField.TO) }
                 )
             }
+
             Box(
                 modifier = Modifier
-                    .padding(bottom = 10.dp)
+                    .padding(bottom = 16.dp)
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
             ) {
                 UnitKeypad(
                     onKeyPress = { key ->
-                        when (key) {
-                            "⇅" -> {
-                                val tmpValue = fromValue
-                                fromValue = toValue
-                                toValue = tmpValue
-
-                                val tmpUnit = fromUnit
-                                fromUnit = toUnit
-                                toUnit = tmpUnit
-                            }
-
-                            else -> {
-                                when (activeField) {
-                                    ActiveField.FROM -> {
-                                        fromValue = handleInput(fromValue, key)
-                                        recalculate(ActiveField.FROM, fromValue)
-                                    }
-
-                                    ActiveField.TO -> {
-                                        toValue = handleInput(toValue, key)
-                                        recalculate(ActiveField.TO, toValue)
-                                    }
-
-                                    else -> {
-                                        fromValue = handleInput(fromValue, key)
-                                        recalculate(ActiveField.FROM, fromValue)
-                                    }
-                                }
-                            }
-                        }
+                        viewModel.onKeyPress(key)
                     }
                 )
             }
         }
     }
 
-    if (showUnitPicker) {
+    if (state.showUnitPicker) {
         UnitPickerBottomSheet(
             title = R.string.unit_calculator_choose,
-            units = units,
-            selectedUnit = when (unitPickerFor) {
-                ActiveField.FROM -> fromUnit
-                ActiveField.TO -> toUnit
+            units = state.units,
+            selectedUnit = when (state.unitPickerFor) {
+                ActiveField.FROM -> state.fromUnit
+                ActiveField.TO -> state.toUnit
                 else -> null
             },
             onSelect = { unit ->
-                when (unitPickerFor) {
-                    ActiveField.FROM -> {
-                        fromUnit = unit
-                        recalculate(ActiveField.TO, toValue)
-                    }
-                    ActiveField.TO -> {
-                        toUnit = unit
-                        recalculate(ActiveField.FROM, fromValue)
-                    }
-                    else -> {}
-                }
-                showUnitPicker = false
+                viewModel.onUnitSelected(unit)
             },
             onDismiss = {
-                showUnitPicker = false
+                viewModel.dismissPicker()
             }
         )
     }

@@ -1,5 +1,7 @@
 package dhn.intern.smart_ai_caculator_app.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -34,6 +36,7 @@ import dhn.intern.smart_ai_caculator_app.ui.viewmodel.GraphingCalculatorViewMode
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavHost(
     navController: NavHostController = rememberNavController(),
@@ -159,25 +162,27 @@ fun AppNavHost(
             )
         }
         composable(
-            route = "${NavScreen.GraphingCalculatorScreen.route}?expr={expr}",
+            route = NavScreen.HistoryScreen.route, // "history_screen/{source}"
             arguments = listOf(
-                navArgument("expr") {
+                navArgument("source") {
                     type = NavType.StringType
-                    nullable = true
-                    defaultValue = null
                 }
             )
         ) { backStackEntry ->
-            val initialExpr = backStackEntry.arguments?.getString("expr")
-            val graphingViewModel: GraphingCalculatorViewModel = koinViewModel()
-            LaunchedEffect(initialExpr) {
-                if (!initialExpr.isNullOrBlank()) {
-                    graphingViewModel.updateFunctionExpression(0, initialExpr)
+            val rawSource = backStackEntry.arguments?.getString("source")
+            val source = if (!rawSource.isNullOrBlank()) {
+                try {
+                    HistorySource.valueOf(rawSource)
+                } catch (_: Exception) {
+                    HistorySource.CALCULATOR
                 }
+            } else {
+                HistorySource.CALCULATOR
             }
-            GraphingCalculatorScreen(
+
+            HistoryScreen(
                 navController = navController,
-                viewModel = graphingViewModel
+                source = source
             )
         }
 
@@ -212,18 +217,25 @@ fun AppNavHost(
         }
 
         composable(
-            route = NavScreen.HistoryScreen.route,
+            route = "history_screen?source={source}",
             arguments = listOf(
                 navArgument("source") {
                     type = NavType.StringType
+                    nullable = true
+                    defaultValue = HistorySource.CALCULATOR.name
                 }
             )
         ) { backStackEntry ->
-
-            val source = backStackEntry.arguments
-                ?.getString("source")
-                ?.let { HistorySource.valueOf(it) }
-                ?: HistorySource.CALCULATOR
+            val sourceArg = backStackEntry.arguments?.getString("source")
+            val source = try {
+                if (!sourceArg.isNullOrBlank()) {
+                    HistorySource.valueOf(sourceArg.trim().uppercase())
+                } else {
+                    HistorySource.CALCULATOR
+                }
+            } catch (_: Exception) {
+                HistorySource.CALCULATOR
+            }
 
             HistoryScreen(
                 navController = navController,

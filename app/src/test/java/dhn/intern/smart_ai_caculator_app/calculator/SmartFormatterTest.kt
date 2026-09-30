@@ -48,7 +48,7 @@ class SmartFormatterTest {
         assertEquals("155", SmartFormatter.formatCurrency(155.49, "JPY"))
 
         // Standard major currencies (USD, EUR, GBP): 2-4 decimal places, trimming trailing zeros
-        assertEquals("10.5", SmartFormatter.formatCurrency(10.50, "USD"))
+        assertEquals("10.50", SmartFormatter.formatCurrency(10.50, "USD"))
         assertEquals("10.55", SmartFormatter.formatCurrency(10.55, "EUR"))
         assertEquals("10.5525", SmartFormatter.formatCurrency(10.55254, "GBP"))
     }

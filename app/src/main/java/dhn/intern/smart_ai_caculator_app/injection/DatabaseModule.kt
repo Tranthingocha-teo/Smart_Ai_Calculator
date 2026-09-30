@@ -14,12 +14,17 @@ val databaseModule = module {
             CalculatorDatabase::class.java,
             "calculator_db"
         )
-            .addMigrations(CalculatorDatabase.MIGRATION_1_2)
+            .addMigrations(
+                CalculatorDatabase.MIGRATION_1_2,
+                CalculatorDatabase.MIGRATION_2_3
+            )
             .fallbackToDestructiveMigration(dropAllTables = true)
             .build()
     }
 
     single { get<CalculatorDatabase>().historyDao() }
+
+    single { get<CalculatorDatabase>().currencyRateDao() }
 
     single { CalculatorHistoryRepository(get()) }
 }
