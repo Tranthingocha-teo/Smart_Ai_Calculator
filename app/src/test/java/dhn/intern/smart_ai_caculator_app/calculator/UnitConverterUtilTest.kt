@@ -139,4 +139,57 @@ class UnitConverterUtilTest {
         val zero = UnitConverterUtil.convert(0.0, "km", "mi", UnitCategory.LENGTH)
         assertEquals(0.0, zero, 0.0001)
     }
+
+    @Test
+    fun testTemperatureConversion() {
+        // 0°C = 32°F
+        val cToFZero = UnitConverterUtil.convert(0.0, "°C", "°F", UnitCategory.TEMPERATURE)
+        assertEquals(32.0, cToFZero, 0.001)
+
+        // 0°C = 273.15K
+        val cToKZero = UnitConverterUtil.convert(0.0, "°C", "K", UnitCategory.TEMPERATURE)
+        assertEquals(273.15, cToKZero, 0.001)
+
+        // 100°C = 212°F
+        val cToF100 = UnitConverterUtil.convert(100.0, "°C", "°F", UnitCategory.TEMPERATURE)
+        assertEquals(212.0, cToF100, 0.001)
+
+        // 100°C = 373.15K
+        val cToK100 = UnitConverterUtil.convert(100.0, "°C", "K", UnitCategory.TEMPERATURE)
+        assertEquals(373.15, cToK100, 0.001)
+
+        // -40°C = -40°F
+        val cToFMinus40 = UnitConverterUtil.convert(-40.0, "°C", "°F", UnitCategory.TEMPERATURE)
+        assertEquals(-40.0, cToFMinus40, 0.001)
+
+        // 0K = -273.15°C
+        val kToCZero = UnitConverterUtil.convert(0.0, "K", "°C", UnitCategory.TEMPERATURE)
+        assertEquals(-273.15, kToCZero, 0.001)
+
+        // 36.6°C to °F & K
+        val bodyTempF = UnitConverterUtil.convert(36.6, "°C", "°F", UnitCategory.TEMPERATURE)
+        assertEquals(97.88, bodyTempF, 0.01)
+
+        val bodyTempK = UnitConverterUtil.convert(36.6, "°C", "K", UnitCategory.TEMPERATURE)
+        assertEquals(309.75, bodyTempK, 0.01)
+
+        // 98.6°F to °C
+        val fToC = UnitConverterUtil.convert(98.6, "°F", "°C", UnitCategory.TEMPERATURE)
+        assertEquals(37.0, fToC, 0.01)
+
+        // 300.15K to °C & °F
+        val kToC = UnitConverterUtil.convert(300.15, "K", "°C", UnitCategory.TEMPERATURE)
+        assertEquals(27.0, kToC, 0.01)
+
+        val kToF = UnitConverterUtil.convert(300.15, "K", "°F", UnitCategory.TEMPERATURE)
+        assertEquals(80.6, kToF, 0.01)
+
+        // Negative values & decimals
+        val negFToC = UnitConverterUtil.convert(-20.0, "°F", "°C", UnitCategory.TEMPERATURE)
+        assertEquals(-28.8889, negFToC, 0.01)
+
+        // Identity
+        val sameC = UnitConverterUtil.convert(25.5, "°C", "°C", UnitCategory.TEMPERATURE)
+        assertEquals(25.5, sameC, 0.0001)
+    }
 }
