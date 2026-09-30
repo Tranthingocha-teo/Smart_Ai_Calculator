@@ -2,8 +2,8 @@ package dhn.intern.smart_ai_caculator_app.injection
 
 import dhn.intern.smart_ai_caculator_app.data.remote.CurrencyApiService
 import dhn.intern.smart_ai_caculator_app.data.repository.CurrencyRepository
-import dhn.intern.smart_ai_caculator_app.ui.currency.CurrencyCalculatorViewModel
-import org.koin.androidx.viewmodel.dsl.viewModelOf
+import dhn.intern.smart_ai_caculator_app.ui.viewmodel.UnitCalculatorViewModel
+import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -25,6 +25,11 @@ val currencyModule = module {
         )
     }
 
-    // Khai báo ViewModel theo đúng chuẩn Koin DSL quy định trong ADR 0002
-    viewModelOf(::CurrencyCalculatorViewModel)
+    // Đăng ký UnitCalculatorViewModel thay thế CurrencyCalculatorViewModel cũ
+    viewModel {
+        UnitCalculatorViewModel(
+            currencyRepository = get(),
+            historyRepo = get()
+        )
+    }
 }

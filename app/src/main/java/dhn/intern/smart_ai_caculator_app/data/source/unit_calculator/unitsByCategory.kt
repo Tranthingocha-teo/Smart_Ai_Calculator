@@ -38,7 +38,7 @@ fun unitsByCategory(category: UnitCategory): List<UnitItemUI> =
             UnitItemUI("cL", "Centiliter"),
             UnitItemUI("dL", "Deciliter"),
             UnitItemUI("hL", "Hectoliter"),
-            UnitItemUI("kL", "Kiliter"),
+            UnitItemUI("kL", "Kiloliter"),
             UnitItemUI("m³", "Cubic meter"),
             UnitItemUI("cm³", "Cubic centimeter"),
             UnitItemUI("gal", "Gallon (US)"),

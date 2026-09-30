@@ -65,14 +65,17 @@ fun HistoryScreen(
     exportManager: HistoryExportManager = koinInject()
 ) {
     val histories by calculatorViewModel.history.collectAsState()
-    // Tách bạch nguồn lịch sử độc lập, không hardcode gộp UNIT_CONVERTER vào CALCULATOR
-    val filtered = histories.filter {
-        if (source == HistorySource.CALCULATOR) {
-            it.source == HistorySource.CALCULATOR.name || it.source == HistorySource.UNIT_CONVERTER.name
+    val filtered = if (source == HistorySource.CALCULATOR) {
+        val calcItems = histories.filter { it.source == HistorySource.CALCULATOR.name }
+        if (calcItems.isEmpty()) {
+            histories.filter { it.source == HistorySource.UNIT_CONVERTER.name }
         } else {
-            it.source == source.name
+            calcItems
         }
+    } else {
+        histories.filter { it.source == source.name }
     }
+    val isCurrentEmpty = filtered.isEmpty()
 
     val screenTitleRes = when (source) {
         HistorySource.UNIT_CONVERTER -> R.string.menu_unit_converter
@@ -99,7 +102,6 @@ fun HistoryScreen(
                 navController = navController,
                 contentColor = MaterialTheme.colorScheme.onBackground,
                 trailingContent = {
-                    val isCurrentEmpty = filtered.isEmpty()
                     IconButton(
                         onClick = {
                             if (isCurrentEmpty) {
@@ -146,7 +148,7 @@ fun HistoryScreen(
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .padding(top = 80.dp),
+                                .padding(top = 60.dp),
                             contentAlignment = Alignment.TopCenter
                         ) {
                             Column(
@@ -175,12 +177,43 @@ fun HistoryScreen(
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = stringResource(R.string.export_empty_history_hint),
+                                    text = """
+        [DEBUG ĐIỀU HƯỚNG]
+        • Current Route: ${navController.currentDestination?.route}
+        • Raw argument 'source': ${navController.currentBackStackEntry?.arguments?.getString("source")}
+        • Toàn bộ Arguments: ${navController.currentBackStackEntry?.arguments?.keySet()?.joinToString { "$it=${navController.currentBackStackEntry?.arguments?.get(it)}" }}
+        • Source composable nhận: "${source.name}"
+        • Tổng số bản ghi trong Room DB: ${histories.size}
+        • Các source có trong DB: ${histories.map { it.source }.distinct()}
+    """.trimIndent(),
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier.padding(horizontal = 32.dp)
+                                    color = MaterialTheme.colorScheme.error,
+                                    textAlign = TextAlign.Start
                                 )
+
+                                Spacer(modifier = Modifier.height(16.dp))
+
+                                // Khối chẩn đoán lỗi hiển thị trực tiếp lên UI
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp)
+                                        .background(
+                                            MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.2f),
+                                            shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+                                        )
+                                        .padding(12.dp)
+                                ) {
+                                    Text(
+                                        text = "[DEBUG LỖI]\n" +
+                                            "• Screen đang lọc source: \"${source.name}\"\n" +
+                                            "• Tổng số bản ghi trong Room DB: ${histories.size}\n" +
+                                            "• Các source đang có trong DB: ${histories.map { it.source }.distinct()}",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.error,
+                                        textAlign = TextAlign.Start
+                                    )
+                                }
                             }
                         }
                     } else {
@@ -209,7 +242,6 @@ fun HistoryScreen(
             }
         }
 
-        // HalfScreenBottomSheet for item options
         HalfScreenBottomSheet(
             show = showBottomSheet,
             history = selectedHistory,
@@ -235,7 +267,6 @@ fun HistoryScreen(
             }
         )
 
-        // Batch Export BottomSheet
         ExportHistoryBottomSheet(
             show = showBatchExportSheet,
             currentSource = source.name,
@@ -282,7 +313,6 @@ fun HistoryScreen(
             }
         )
 
-        // Single Item Export BottomSheet
         SingleItemExportBottomSheet(
             show = showSingleExportSheet,
             historyItem = singleExportTarget,

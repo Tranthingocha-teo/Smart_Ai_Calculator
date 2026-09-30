@@ -44,20 +44,17 @@ object SmartFormatter {
      * - Minimum 2 and up to 4 decimal places for standard fiat currencies (USD, EUR, GBP, etc.)
      */
     fun formatCurrency(value: Double, currencyCode: String): String {
-        val code = currencyCode.uppercase()
-
-        // 1. VND và JPY: làm tròn số nguyên không lấy phần thập phân
-        if (code == "VND" || code == "JPY") {
-            val rounded = BigDecimal(value.toString()).setScale(0, RoundingMode.HALF_UP)
-            return rounded.toPlainString()
+        val symbols = java.text.DecimalFormatSymbols(java.util.Locale.US)
+        return when (currencyCode.uppercase().trim()) {
+            "VND", "JPY" -> {
+                val format = java.text.DecimalFormat("#,##0", symbols)
+                format.format(kotlin.math.round(value).toLong())
+            }
+            else -> {
+                val format = java.text.DecimalFormat("#,##0.00##", symbols)
+                format.format(value)
+            }
         }
-
-        // 2. Các tiền tệ khác (USD, EUR, GBP...): làm tròn tối đa 4 chữ số thập phân, bỏ số 0 vô nghĩa ở đuôi
-        val symbols = DecimalFormatSymbols(Locale.US)
-        val df = DecimalFormat("#.####", symbols).apply {
-            roundingMode = java.math.RoundingMode.HALF_UP
-        }
-        return df.format(value)
     }
 
     private fun cleanFormattedString(formatted: String): String {

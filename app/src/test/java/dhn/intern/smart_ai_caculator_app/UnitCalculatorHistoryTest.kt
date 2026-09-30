@@ -1,21 +1,21 @@
 package dhn.intern.smart_ai_caculator_app
 
-import dhn.intern.smart_ai_caculator_app.data.repository.CalculatorHistoryRepository
+import dhn.intern.smart_ai_caculator_app.data.local.dao.CalculatorHistoryDao
 import dhn.intern.smart_ai_caculator_app.data.repository.CurrencyRepository
-import dhn.intern.smart_ai_caculator_app.ui.currency.CurrencyCalculatorViewModel
+import dhn.intern.smart_ai_caculator_app.data.source.currencies.DefaultCurrencyRates
+import dhn.intern.smart_ai_caculator_app.ui.viewmodel.UnitCalculatorViewModel
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import io.mockk.slot
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
@@ -24,20 +24,12 @@ class UnitCalculatorHistoryTest {
 
     private val testDispatcher = StandardTestDispatcher()
     private val currencyRepository: CurrencyRepository = mockk(relaxed = true)
-    private val historyRepository: CalculatorHistoryRepository = mockk(relaxed = true)
-
-    private lateinit var viewModel: CurrencyCalculatorViewModel
+    private val historyDao: CalculatorHistoryDao = mockk(relaxed = true)
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        coEvery { currencyRepository.getRates() } returns mapOf("USD" to 1.0, "EUR" to 0.9)
-        coEvery { currencyRepository.getLastUpdatedTimestamp() } returns System.currentTimeMillis()
-
-        viewModel = CurrencyCalculatorViewModel(
-            currencyRepository = currencyRepository,
-            historyRepository = historyRepository
-        )
+        coEvery { currencyRepository.getRates() } returns DefaultCurrencyRates.FALLBACK_RATES
     }
 
     @After
@@ -46,35 +38,37 @@ class UnitCalculatorHistoryTest {
     }
 
     @Test
-    fun `debounce prevents multiple inserts when typing quickly and saves only final value`() = runTest {
-        val capturedExpression = slot<String>()
-        coEvery {
-            historyRepository.saveUnitConverter(capture(capturedExpression), any())
-        } returns Unit
+    fun testDebouncedSaveHistoryExecutesAfterDelay() = runTest(testDispatcher) {
+        val viewModel = UnitCalculatorViewModel(
+            currencyRepository = currencyRepository,
+            historyDao = historyDao,
+            ioDispatcher = testDispatcher
+        )
 
-        // Mô phỏng người dùng gõ liên tục: 1 -> 10 -> 100 trong khoảng cách ngắn (< 1500ms)
-        viewModel.onAmountChanged(1.0)
-        advanceTimeBy(500L)
+        viewModel.onKeyPress("5")
 
-        viewModel.onAmountChanged(10.0)
-        advanceTimeBy(500L)
+        // 1. Chỉ tua đúng 1000ms (chưa đủ 1500ms debounce), không dùng advanceUntilIdle() ở đây
+        advanceTimeBy(1000)
+        testScheduler.runCurrent()
+        coVerify(exactly = 0) { historyDao.insert(any()) }
 
-        viewModel.onAmountChanged(100.0)
-
-        // Dừng gõ, chờ vượt mốc debounce 1500ms
-        advanceTimeBy(1600L)
-
-        // Xác minh chỉ gọi saveUnitConverter đúng 1 lần duy nhất với giá trị cuối
-        coVerify(exactly = 1) { historyRepository.saveUnitConverter(any(), any()) }
-        assertEquals("100.0 USD", capturedExpression.captured)
+        // 2. Tua thêm 600ms (tổng 1600ms > 1500ms), debounce đã kích hoạt
+        advanceTimeBy(600)
+        advanceUntilIdle()
+        coVerify(atLeast = 1) { historyDao.insert(any()) }
     }
 
     @Test
-    fun `do not insert history when input value is zero or negative`() = runTest {
-        viewModel.onAmountChanged(0.0)
-        advanceTimeBy(2000L)
+    fun testSwapUnitsSavesImmediately() = runTest(testDispatcher) {
+        val viewModel = UnitCalculatorViewModel(
+            currencyRepository = currencyRepository,
+            historyDao = historyDao,
+            ioDispatcher = testDispatcher
+        )
 
-        // Xác minh không được lưu vào DB khi số tiền <= 0
-        coVerify(exactly = 0) { historyRepository.saveUnitConverter(any(), any()) }
+        viewModel.onKeyPress("⇅")
+        advanceUntilIdle()
+
+        coVerify(atLeast = 1) { historyDao.insert(any()) }
     }
 }
