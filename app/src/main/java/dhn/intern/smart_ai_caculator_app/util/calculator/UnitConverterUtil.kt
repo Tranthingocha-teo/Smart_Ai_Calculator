@@ -138,8 +138,13 @@ object UnitConverterUtil {
         toUnitId: String,
         category: UnitCategory
     ): Double {
-        if (value == 0.0) return 0.0
         if (fromUnitId == toUnitId) return value
+
+        if (category == UnitCategory.TEMPERATURE) {
+            return convertTemperature(value, fromUnitId, toUnitId)
+        }
+
+        if (value == 0.0) return 0.0
 
         val ratioMap = when (category) {
             UnitCategory.LENGTH -> lengthRatios
@@ -154,7 +159,7 @@ object UnitConverterUtil {
             UnitCategory.ENERGY -> energyRatios
             UnitCategory.ANGLE -> angleRatios
             UnitCategory.FUEL -> fuelRatios
-            UnitCategory.TEMPERATURE -> emptyMap() // Handled in #30
+            else -> emptyMap()
         }
 
         val fromRatio = ratioMap[fromUnitId] ?: return value
@@ -163,5 +168,25 @@ object UnitConverterUtil {
         // Convert to base unit, then to target unit
         val valueInBase = value * fromRatio
         return valueInBase / toRatio
+    }
+
+    private fun convertTemperature(
+        value: Double,
+        fromUnitId: String,
+        toUnitId: String
+    ): Double {
+        val celsius = when (fromUnitId) {
+            "°C" -> value
+            "°F" -> (value - 32.0) * 5.0 / 9.0
+            "K" -> value - 273.15
+            else -> return value
+        }
+
+        return when (toUnitId) {
+            "°C" -> celsius
+            "°F" -> celsius * 9.0 / 5.0 + 32.0
+            "K" -> celsius + 273.15
+            else -> value
+        }
     }
 }

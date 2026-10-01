@@ -89,6 +89,13 @@ object UnitData {
                 title = R.string.unit_calculator_fuel,
                 navHost = "fuel_unit_converter",
                 category = UnitCategory.FUEL
+            ),
+            UnitUi(
+                image = null,
+                iconText = "🌡\uFE0F",
+                title = R.string.unit_calculator_temperature,
+                navHost = "temperature_unit_converter",
+                category = UnitCategory.TEMPERATURE
             )
         )
     }
